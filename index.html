@@ -228,18 +228,22 @@
             box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); transition: 0.2s;
         }
         .modal-btn:hover { background: linear-gradient(135deg, #8b5cf6, #7c3aed); transform: translateY(-2px); }
+        
+        #play-again-btn { 
+            background: #48bb78; color: white; border: none; padding: 12px 25px; 
+            font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; 
+            display: none; margin-top: 10px; box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3); 
+        }
+        #play-again-btn:hover { background: #38a169; }
     </style>
 </head>
 <body>
 
-    <!-- 🔥 開場說明與名字輸入頁面 -->
+    <!-- 🔥 開場說明頁面 (無須輸入名字，直接開始) -->
     <div id="intro-overlay">
         <div id="intro-box">
             <h2>🚀 Welcome, Scholar!</h2>
-            <p style="color: #718096; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem;">Please enter your name:</p>
-            <input type="text" id="intro-student-name" placeholder="e.g., Alex">
-            
-            <div style="background: #fff5f5; border: 2px dashed #fc8181; border-radius: 12px; padding: 12px; margin: 15px 0; text-align: left; color: #c53030; font-size: 0.9rem; line-height: 1.4;">
+            <div style="background: #fff5f5; border: 2px dashed #fc8181; border-radius: 12px; padding: 15px; margin: 15px 0; text-align: left; color: #c53030; font-size: 0.95rem; line-height: 1.5;">
                 <p style="margin: 0 0 6px 0; font-weight: bold;">⚠️ Game Instructions & Rules:</p>
                 <p style="margin: 0;">Drag and drop parts into the Magic Drop Zone to form characters. <b>Once a character is successfully formed, you cannot repeat it!</b> Completed characters cannot be formed again.</p>
             </div>
@@ -358,17 +362,23 @@
         </div>
     </div>
 
-    <!-- 🔥 自動提交後的結算畫面 -->
+    <!-- 🔥 遊戲結束時自動交卷並輸入名字的結算畫面 -->
     <div id="modal-overlay" style="display: none;">
         <div id="modal-box">
-            <h2 id="modal-title">🎉 Amazing Work!</h2>
+            <h2 id="modal-title">🚪 Score Portal</h2>
             <div class="score-board">
                 <p>🏆 Correct Answers: <span id="final-score" style="color: #e53e3e; font-size: 1.4rem;">0</span> / 31</p>
                 <p>⏱️ Time Taken: <span id="final-time" style="color: #3182ce;">00:00</span></p>
             </div>
-            <p id="submission-status" style="font-weight: bold; color: #48bb78; margin-bottom: 15px; font-size: 0.95rem;">✅ Score automatically sent to the teacher!</p>
+            
+            <p style="color: #718096; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem;">Please enter your name:</p>
+            <input type="text" id="student-name" placeholder="e.g., Alex">
+            
+            <p id="submission-status" style="font-weight: bold; color: #48bb78; margin: 10px 0; font-size: 0.9rem;"></p>
             <p id="encouragement-text" style="color: #4a5568; font-weight: bold; margin-bottom: 15px; font-size: 0.95rem;"></p>
-            <button class="modal-btn" id="play-again-btn" onclick="location.reload()" style="display: block;">Play Again ✨</button>
+            
+            <button class="modal-btn" id="modal-submit-btn" onclick="submitScore()">Submit Score to Teacher</button>
+            <button class="modal-btn" id="play-again-btn" onclick="location.reload()" style="display: none; background: #48bb78;">Play Again ✨</button>
         </div>
     </div>
 
@@ -467,7 +477,6 @@
 
         const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
 
-        let studentName = "";
         let score = 0;
         let currentStageIndex = 0;
         let mistakes = 0;
@@ -478,12 +487,6 @@
         let timerInterval = null;
 
         function startGame() {
-            let nameInput = document.getElementById('intro-student-name').value.trim();
-            if(!nameInput) {
-                alert("Please enter your name to start!");
-                return;
-            }
-            studentName = nameInput;
             document.getElementById('intro-overlay').style.display = 'none';
 
             startTime = Date.now();
@@ -792,15 +795,11 @@
 
         function endGame(isWin) {
             if(timerInterval) clearInterval(timerInterval); 
-            
-            // 🔥 自動提交成績到 Google 試算表
-            autoSubmitScore();
 
             document.getElementById('modal-overlay').style.display = 'flex';
             document.getElementById('final-score').innerText = score;
             document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
 
-            // 隨機抽選一句精美英文鼓勵
             let randomEncouragement = finalCheers[Math.floor(Math.random() * finalCheers.length)];
             document.getElementById('encouragement-text').innerText = randomEncouragement;
 
@@ -812,14 +811,19 @@
             }
         }
 
-        function autoSubmitScore() {
-            if(!studentName) studentName = "Anonymous";
+        function submitScore() {
+            let name = document.getElementById('student-name').value.trim();
+            if(!name) { alert("Please enter your name!"); return; }
+            
+            let btn = document.getElementById('modal-submit-btn');
+            btn.innerText = "Submitting Score...";
+            btn.disabled = true;
 
             const formData = new URLSearchParams();
             formData.append('score', score); 
-            formData.append('name', studentName);
-            formData.append('studentName', studentName);
-            formData.append('學生姓名', studentName);
+            formData.append('name', name);
+            formData.append('studentName', name);
+            formData.append('學生姓名', name);
             
             let wrongDetail = wrongRecords.length > 0 ? `${mistakes} mistakes (${wrongRecords.join(', ')})` : "Perfect";
             formData.append('wrongAnswers', wrongDetail); 
@@ -838,9 +842,13 @@
                 body: formData
             }).then(() => {
                 document.getElementById('submission-status').innerText = "✅ Score successfully sent to the teacher!";
+                btn.style.display = "none";
+                document.getElementById('play-again-btn').style.display = "block";
             }).catch(err => {
                 console.error(err);
-                document.getElementById('submission-status').innerText = "⚠️ Score submission attempted.";
+                document.getElementById('submission-status').innerText = "❌ Submission failed. Please check your network connection.";
+                btn.innerText = "Try Again";
+                btn.disabled = false;
             });
         }
     </script>
