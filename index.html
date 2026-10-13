@@ -11,23 +11,21 @@
             color: #2d3748;
             margin: 0;
             padding: 0;
-            /* 🔥 升級為 dvh (動態視窗高度)，解決手機網址列吃掉底部的問題 */
+            /* 🔥 使用動態視窗高度 100dvh，確保網頁完全貼合手機螢幕 */
             height: 100dvh; 
             display: flex;
             flex-direction: column;
-            overscroll-behavior: none; 
-            overflow: hidden; 
+            overscroll-behavior: none; /* 防止手機下拉重新整理 */
+            overflow: hidden; /* 鎖死整個網頁的滾動 */
             user-select: none; 
             -webkit-user-select: none;
         }
 
         header {
-            position: sticky;
-            top: 0;
             padding: 10px 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(5px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
@@ -70,130 +68,71 @@
             border: 2px solid #e2e8f0;
         }
 
-        /* 🔥 按鈕區塊 */
-        .btn-group {
-            display: flex;
-            gap: 8px;
-        }
+        .btn-group { display: flex; gap: 8px; }
 
         .action-btn {
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            font-size: 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
+            color: white; border: none; padding: 6px 12px;
+            font-size: 1rem; border-radius: 8px; cursor: pointer;
+            font-weight: bold; transition: all 0.2s;
         }
-        
         #fullscreen-btn { background: #4299e1; box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3); }
         #fullscreen-btn:hover { background: #3182ce; transform: translateY(-2px); }
-
         #end-game-btn { background: #e53e3e; box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3); }
-        #end-game-btn:hover { background: #c53030; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(229, 62, 62, 0.4); }
+        #end-game-btn:hover { background: #c53030; transform: translateY(-2px); }
 
-        .energy-container {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .energy-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: #718096;
-        }
-        .energy-bar-bg {
-            background-color: #e2e8f0;
-            height: 14px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-        .energy-bar-fill {
-            background: linear-gradient(90deg, #ff7e5f, #feb47b);
-            height: 100%;
-            width: 0%;
-            border-radius: 10px;
-            transition: width 0.5s ease-out;
-        }
+        .energy-container { display: flex; flex-direction: column; gap: 5px; }
+        .energy-labels { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; color: #718096; }
+        .energy-bar-bg { background-color: #e2e8f0; height: 12px; border-radius: 10px; overflow: hidden; position: relative; }
+        .energy-bar-fill { background: linear-gradient(90deg, #ff7e5f, #feb47b); height: 100%; width: 0%; border-radius: 10px; transition: width 0.5s ease-out; }
 
+        /* 🔥 電腦版預設佈局 (左右排列) */
         #game-board {
             flex-grow: 1;
             display: flex;
+            flex-direction: row;
             padding: 15px 20px;
             gap: 15px;
             box-sizing: border-box;
-            height: calc(100dvh - 90px);
+            height: calc(100dvh - 85px);
         }
 
         .panel {
-            background: #ffffff;
-            border-radius: 15px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.04);
-            box-sizing: border-box;
+            background: #ffffff; border-radius: 15px; padding: 15px;
+            display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.04); box-sizing: border-box;
         }
 
-        #left-panel { 
-            flex: 1; 
-            justify-content: center; 
-            position: relative; 
-            background: transparent;
-            box-shadow: none;
-        }
+        #left-panel { flex: 1; justify-content: center; position: relative; background: transparent; box-shadow: none; }
+        #center-panel { flex: 1.2; justify-content: flex-start; border: 3px dashed #cbd5e0; background: #f8fafc; }
+        #right-panel { flex: 1.5; display: flex; flex-direction: column; min-height: 0; }
         
+        .panel-title { font-size: 1.15rem; font-weight: bold; margin-bottom: 5px; color: #2d3748; text-align: center; }
+        .panel-subtitle { font-size: 0.85rem; color: #a0aec0; margin-bottom: 12px; text-align: center; }
+        
+        #cauldron { flex-grow: 1; width: 100%; border-radius: 15px; position: relative; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
+
+        #parts-container {
+            flex-grow: 1; width: 100%; display: flex; flex-wrap: wrap; align-content: flex-start; 
+            gap: 10px; overflow-y: auto; padding-right: 5px; padding-bottom: 20px; position: relative;
+        }
+        #parts-container::-webkit-scrollbar { width: 6px; }
+        #parts-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+
         .speech-bubble {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #4a5568;
-            position: relative;
-            margin-bottom: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            text-align: center;
-            animation: float 3s ease-in-out infinite;
-            max-width: 90%;
-            z-index: 20;
+            background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 10px 20px;
+            font-size: 1rem; font-weight: bold; color: #4a5568; position: relative; margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05); text-align: center; animation: float 3s ease-in-out infinite; z-index: 20;
         }
-        .speech-bubble::after {
-            content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
-            border-width: 10px 10px 0; border-style: solid; border-color: white transparent transparent transparent;
-        }
-        .speech-bubble::before {
-            content: ''; position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%);
-            border-width: 12px 12px 0; border-style: solid; border-color: #e2e8f0 transparent transparent transparent; z-index: -1;
-        }
+        .speech-bubble::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); border-width: 10px 10px 0; border-style: solid; border-color: white transparent transparent transparent; }
+        .speech-bubble::before { content: ''; position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%); border-width: 12px 12px 0; border-style: solid; border-color: #e2e8f0 transparent transparent transparent; z-index: -1; }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 
-        #monster-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s;
-        }
-        
-        #monster-svg {
-            width: 280px;
-            height: 280px;
-            overflow: visible;
-        }
+        #monster-container { width: 100%; display: flex; justify-content: center; align-items: center; transition: all 0.3s; }
+        #monster-svg { width: 280px; height: 280px; overflow: visible; }
         
         #monster-container .monster-part { opacity: 0; transition: opacity 0.8s ease; transform-origin: center; }
-        
         #monster-container.monster-stage-1 .stage-1-part { opacity: 1; }
         #monster-container.monster-stage-2 .stage-1-part, #monster-container.monster-stage-2 .stage-2-part { opacity: 1; }
         #monster-container.monster-stage-3 .stage-1-part, #monster-container.monster-stage-3 .stage-2-part, #monster-container.monster-stage-3 .stage-3-part { opacity: 1; }
@@ -203,51 +142,18 @@
         #angry-face { display: none; }
         #monster-container.monster-stage-4 #cute-face { display: none; }
         #monster-container.monster-stage-4 #angry-face { display: block; }
-
         #cute-mouth-open { display: none; }
         #monster-container.is-eating #cute-mouth-closed { display: none !important; }
         #monster-container.is-eating #cute-mouth-open { display: block !important; }
 
-        @keyframes ragingFire {
-            0% { transform: scale(0.95) translateY(5px); filter: drop-shadow(0 0 10px #E53E3E); }
-            100% { transform: scale(1.05) translateY(-5px); filter: brightness(1.3) drop-shadow(0 0 30px #F6E05E); }
-        }
+        @keyframes ragingFire { 0% { transform: scale(0.95) translateY(5px); filter: drop-shadow(0 0 10px #E53E3E); } 100% { transform: scale(1.05) translateY(-5px); filter: brightness(1.3) drop-shadow(0 0 30px #F6E05E); } }
         .fire-aura { transform-origin: center; animation: ragingFire 0.4s infinite alternate; }
 
-        @keyframes starTwinkle {
-            0%, 100% { transform: scale(1) rotate(0deg); fill: #f6e05e; }
-            50% { transform: scale(1.2) rotate(20deg); fill: #fff382; }
-        }
+        @keyframes starTwinkle { 0%, 100% { transform: scale(1) rotate(0deg); fill: #f6e05e; } 50% { transform: scale(1.2) rotate(20deg); fill: #fff382; } }
         .star-anim { transform-origin: center; animation: starTwinkle 1.5s infinite; }
 
-        @keyframes happyJump {
-            0%, 100% { transform: translateY(0) scale(1); }
-            30% { transform: translateY(-25px) scale(1.05); }
-            50% { transform: translateY(0) scale(0.95); }
-            70% { transform: translateY(-12px) scale(1.02); }
-        }
+        @keyframes happyJump { 0%, 100% { transform: translateY(0) scale(1); } 30% { transform: translateY(-25px) scale(1.05); } 50% { transform: translateY(0) scale(0.95); } 70% { transform: translateY(-12px) scale(1.02); } }
         .eating-anim { animation: happyJump 0.5s ease-out; }
-
-        #center-panel { 
-            flex: 1.2; justify-content: flex-start; border: 3px dashed #cbd5e0; background: #f8fafc;
-        }
-        .panel-title { font-size: 1.15rem; font-weight: bold; margin-bottom: 5px; color: #2d3748; text-align: center; }
-        .panel-subtitle { font-size: 0.85rem; color: #a0aec0; margin-bottom: 12px; text-align: center; }
-        #cauldron {
-            flex-grow: 1; width: 100%; border-radius: 15px; position: relative; display: flex; align-items: center; justify-content: center; transition: 0.3s;
-        }
-        #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
-
-        #right-panel { flex: 1.5; display: flex; flex-direction: column; }
-        
-        /* 🔥 加大底部防護墊，確保最後一排不會被吃掉 */
-        #parts-container {
-            flex-grow: 1; width: 100%; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; overflow-y: auto; padding-right: 5px; 
-            padding-bottom: 120px; /* 大幅增加底部空間 */
-            position: relative;
-        }
-        #parts-container::-webkit-scrollbar { width: 6px; }
-        #parts-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
 
         .part {
             font-family: "DFKai-SB", "BiauKai", "KaiTi", "STKaiti", "楷體", serif;
@@ -255,104 +161,93 @@
             width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;
             border-radius: 12px; box-shadow: 0 4px 0 #38a169, 0 6px 8px rgba(0,0,0,0.1); 
             touch-action: none; z-index: 10; transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
-            cursor: url('data:image/svg+xml;utf8,%3Csvg%20width%3D%2228%22%20height%3D%2228%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23f6e05e%22%20stroke%3D%22%232d3748%22%20stroke-width%3D%221%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M10.5%202C10.5%201.2%2011.2%200.5%2012%200.5C12.8%200.5%2013.5%201.2%2013.5%202V8H14.5C14.5%207.2%2015.2%206.5%2016%206.5C16.8%206.5%2017.5%207.2%2017.5%208V9H18.5C18.5%208.2%2019.2%207.5%2020%207.5C20.8%207.5%2021.5%208.2%2021.5%209V14C21.5%2018.5%2017.5%2022%2013%2022C8.5%2022%205.5%2018%205.5%2013V11C5.5%2010.2%206.2%209.5%207%209.5C7.8%209.5%208.5%2010.2%208.5%2011V12H9.5V4C9.5%203.2%2010.2%202.5%2011%202.5C11%202.5%2010.5%202%2010.5%202Z%22%2F%3E%3C%2Fsvg%3E') 14 14, grab;
+            cursor: pointer;
         }
 
         .part:hover { background: #f6e05e; color: #2d3748; box-shadow: 0 4px 0 #d69e2e, 0 6px 8px rgba(0,0,0,0.1); }
-        .part:active { transform: scale(0.95) translateY(4px); box-shadow: 0 0 0 #d69e2e, 0 3px 4px rgba(0,0,0,0.1); }
-        .part.dragging {
-            box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 2000 !important;
-            background: #f6e05e !important; border: 3px solid #d69e2e !important; color: #2d3748 !important;
-        }
+        .part.dragging { box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 2000 !important; background: #f6e05e !important; border: 3px solid #d69e2e !important; color: #2d3748 !important; }
 
-        @keyframes combinePulse {
-            0% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.5); filter: brightness(1.2); color: #f6e05e; border-color: #f6e05e; }
-            100% { transform: scale(1.2); filter: brightness(1); }
-        }
+        @keyframes combinePulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.5); filter: brightness(1.2); color: #f6e05e; border-color: #f6e05e; } 100% { transform: scale(1.2); filter: brightness(1); } }
         .success-anim { animation: combinePulse 0.5s forwards; z-index: 500; border: 3px solid #f6e05e !important; background: #48bb78 !important; color: white !important;}
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
         .error-anim { animation: shake 0.4s; background: #fff5f5; border-color: #fc8181; color: #c53030; }
 
-        @keyframes respawnAnim {
-            0% { transform: scale(0); opacity: 0; }
-            80% { transform: scale(1.15); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        /* 🔥 拼錯消失特效：兩個積木捲進黑洞 */
+        @keyframes vanishAnim { 0% { transform: scale(1) rotate(0deg); opacity: 1; } 100% { transform: scale(0) rotate(180deg); opacity: 0; filter: blur(2px); } }
+        .vanish-anim { animation: vanishAnim 0.4s forwards !important; pointer-events: none; }
+
+        /* 🔥 重生特效：積木回到庫存區時彈出 */
+        @keyframes respawnAnim { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
         .respawn-anim { animation: respawnAnim 0.4s forwards !important; }
 
-        #modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 3000;
-        }
-        #modal-box {
-            background: white; padding: 30px; border-radius: 20px; text-align: center;
-            width: 85%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
+        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 3000; }
+        #modal-box { background: white; padding: 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
         #modal-box h2 { color: #e53e3e; font-size: 1.8rem; margin-top: 0; margin-bottom: 10px; }
-        
-        .score-board {
-            background: #f8fafc; border: 2px dashed #cbd5e0; border-radius: 12px;
-            padding: 15px; margin-bottom: 20px;
-        }
+        .score-board { background: #f8fafc; border: 2px dashed #cbd5e0; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
         .score-board p { margin: 5px 0; font-size: 1.2rem; font-weight: bold; color: #4a5568; }
-        
-        #modal-box input {
-            font-size: 1.1rem; padding: 12px; margin: 10px 0 20px 0; width: 85%;
-            border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s;
-        }
+        #modal-box input { font-size: 1.1rem; padding: 12px; margin: 10px 0 20px 0; width: 85%; border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s; }
         #modal-box input:focus { border-color: #8b5cf6; }
-        
-        #modal-submit-btn {
-            background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; 
-            border: none; padding: 12px 30px; font-size: 1.1rem; 
-            border-radius: 10px; cursor: pointer; font-weight: bold;
-            width: 100%; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
-        }
-        
-        #play-again-btn {
-            background: #48bb78; color: white; 
-            border: none; padding: 12px 30px; font-size: 1.1rem; 
-            border-radius: 10px; cursor: pointer; font-weight: bold;
-            width: 100%; box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
-            display: none; margin-top: 10px;
-        }
-        #play-again-btn:hover { background: #38a169; }
+        #modal-submit-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
+        #play-again-btn { background: #48bb78; color: white; border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; display: none; margin-top: 10px; }
 
-        @media (max-width: 600px) {
-            .energy-labels { font-size: 0.8rem; }
-            .stage-pill { padding: 4px 10px; font-size: 0.9rem; }
-            .progress-text { font-size: 0.9rem; gap: 8px; }
-            .timer-display { padding: 2px 8px; }
-        }
 
-        /* 手機直向模式 */
+        /* =========================================
+           🔥 手機直向模式 (App 級固定版面) 🔥
+           ========================================= */
         @media (max-width: 900px) and (orientation: portrait) {
-            #game-board { flex-direction: column; overflow-y: auto; height: auto; }
-            body { height: auto; overflow: auto; }
-            #left-panel, #center-panel { min-height: 250px; }
+            #game-board { 
+                flex-direction: column; 
+                padding: 10px; gap: 10px; 
+            }
+            
+            /* 上方怪獸區：高度鎖死，圖案縮小，對話框靠近 */
+            #left-panel { 
+                flex: 0 0 140px; 
+                justify-content: flex-end; 
+                position: relative; 
+            }
+            #monster-svg { width: 120px; height: 120px; }
+            .speech-bubble { 
+                position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+                margin: 0; padding: 4px 10px; font-size: 0.85rem; 
+                animation: none; /* 取消浮動動畫避免重疊 */
+            }
+            
+            /* 大鍋區：高度鎖死，字體微調 */
+            #center-panel { flex: 0 0 110px; padding: 8px; }
+            .panel-title { font-size: 1rem; margin-bottom: 2px; }
+            .panel-subtitle { font-size: 0.75rem; margin-bottom: 5px; }
+
+            /* 下半部積木區：唯一可以獨立滑動的地方！ */
+            #right-panel { flex: 1 1 auto; padding: 5px; }
+            #parts-container { 
+                overflow-y: auto; /* 獨立滾動軸 */
+                padding-bottom: 10px; 
+            }
+            .part { width: 50px; height: 50px; font-size: 1.6rem; }
+            
+            /* 微調資訊列 */
+            header { padding: 8px 10px; gap: 5px; }
+            .stage-pill { padding: 4px 10px; font-size: 0.9rem; }
+            .progress-text { font-size: 0.9rem; }
+            .action-btn { padding: 4px 8px; font-size: 0.9rem; }
         }
 
-        /* 手機橫向模式 */
+        /* =========================================
+           🔥 手機橫向模式 (左右排列) 🔥
+           ========================================= */
         @media (max-height: 500px) and (orientation: landscape) {
             header { flex-direction: row; padding: 5px 15px; }
             .header-top { flex: 1; gap: 10px; }
             .energy-container { flex: 1; margin-left: 20px; }
             
-            #game-board { flex-direction: row; height: calc(100dvh - 65px); padding: 5px 10px; gap: 10px; }
-            body { height: 100dvh; overflow: hidden; }
-            
+            #game-board { flex-direction: row; padding: 5px 10px; gap: 10px; }
             #left-panel, #center-panel { min-height: unset; flex: 1; }
             #right-panel { flex: 1.5; }
             
-            #monster-svg { width: 130px; height: 130px; }
+            #monster-svg { width: 110px; height: 110px; }
             .speech-bubble { font-size: 0.8rem; padding: 4px 10px; margin-bottom: 5px; }
-            
             .part { width: 40px; height: 40px; font-size: 1.3rem; }
             .panel { padding: 8px; }
             .panel-title { font-size: 0.95rem; margin-bottom: 2px; }
@@ -370,7 +265,6 @@
                 <span class="timer-display">⏱️ <span id="timer">00:00</span></span>
             </div>
             <div class="btn-group">
-                <!-- 🔥 新增全螢幕按鈕 -->
                 <button id="fullscreen-btn" class="action-btn" onclick="toggleFullScreen()">⛶ 全螢幕</button>
                 <button id="end-game-btn" class="action-btn" onclick="endGame(false)">🛑 結束</button>
             </div>
@@ -437,18 +331,14 @@
                         <circle cx="150" cy="105" r="16" fill="white" />
                         <circle cx="150" cy="105" r="8" fill="#3E2723" />
                         <circle cx="147" cy="102" r="3" fill="white" />
-                        
                         <circle cx="115" cy="130" r="18" fill="white" />
                         <circle cx="120" cy="130" r="9" fill="#3E2723" />
                         <circle cx="117" cy="127" r="3" fill="white" />
-                        
                         <circle cx="185" cy="130" r="18" fill="white" />
                         <circle cx="180" cy="130" r="9" fill="#3E2723" />
                         <circle cx="177" cy="127" r="3" fill="white" />
-                        
                         <path id="cute-mouth-closed" d="M 140 155 Q 150 165 160 155" stroke="#3E2723" stroke-width="4" fill="none" stroke-linecap="round"/>
                         <path id="cute-mouth-open" d="M 135 155 Q 150 180 165 155 Z" fill="#3E2723"/>
-                        
                         <ellipse cx="95" cy="145" rx="8" ry="4" fill="#FC8181" opacity="0.6"/>
                         <ellipse cx="205" cy="145" rx="8" ry="4" fill="#FC8181" opacity="0.6"/>
                     </g>
@@ -457,15 +347,12 @@
                         <circle cx="150" cy="105" r="16" fill="white" />
                         <circle cx="150" cy="105" r="7" fill="#c53030" />
                         <path d="M 135 95 L 165 95 L 150 80 Z" fill="url(#bodyGrad)" /> 
-                        
                         <circle cx="115" cy="130" r="18" fill="white" />
                         <circle cx="120" cy="130" r="8" fill="#c53030" />
                         <path d="M 95 115 L 135 125 L 115 100 Z" fill="url(#bodyGrad)" />
-                        
                         <circle cx="185" cy="130" r="18" fill="white" />
                         <circle cx="180" cy="130" r="8" fill="#c53030" />
                         <path d="M 205 115 L 165 125 L 185 100 Z" fill="url(#bodyGrad)" />
-                        
                         <path d="M 130 155 Q 150 195 170 155 Z" fill="#742A2A"/>
                         <path d="M 135 155 L 140 165 L 145 155 L 150 165 L 155 155 L 160 165 L 165 155 Z" fill="white"/> 
                     </g>
@@ -492,15 +379,12 @@
     <div id="modal-overlay">
         <div id="modal-box">
             <h2 id="modal-title">🎉 終極進化完成！</h2>
-            
             <div class="score-board">
                 <p>🏆 答對題數：<span id="final-score" style="color: #e53e3e; font-size: 1.5rem;">0</span> / 31</p>
                 <p>⏱️ 作答時間：<span id="final-time" style="color: #3182ce;">00:00</span></p>
             </div>
-
             <p style="color: #718096; font-weight: bold; margin-bottom: 5px;">請輸入你的名字傳給老師：</p>
             <input type="text" id="student-name" placeholder="例如：王小明">
-            
             <button id="modal-submit-btn" onclick="submitScore()">送出成績</button>
             <button id="play-again-btn" onclick="location.reload()">再玩一次</button>
             <p id="submit-msg" style="font-weight:bold; margin-top:15px;"></p>
@@ -598,7 +482,7 @@
         function initParts() {
             partsContainer.innerHTML = '';
             let shuffled = rawParts.sort(() => Math.random() - 0.5);
-            shuffled.forEach((char, index) => {
+            shuffled.forEach((char) => {
                 let div = document.createElement('div');
                 div.className = 'part';
                 div.innerText = char;
@@ -609,25 +493,28 @@
         }
         initParts();
 
-        // 🔥 全螢幕切換功能
         function toggleFullScreen() {
             let elem = document.documentElement;
             let btn = document.getElementById('fullscreen-btn');
             
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) { /* Safari 支援 */
-                    elem.webkitRequestFullscreen();
+            try {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                    }
+                    btn.innerText = "✖ 退出全螢幕";
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                    btn.innerText = "⛶ 全螢幕";
                 }
-                btn.innerText = "✖ 退出全螢幕";
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { /* Safari 支援 */
-                    document.webkitExitFullscreen();
-                }
-                btn.innerText = "⛶ 全螢幕";
+            } catch (err) {
+                alert("抱歉，由於 Apple 的安全限制，iPhone 上的瀏覽器不支援直接全螢幕喔！不過版面已經為您鎖定最佳大小了。");
             }
         }
 
@@ -757,10 +644,11 @@
                     if (r.p1 === r.p2) {
                         isValid = true;
                     } else {
+                        // 🔥 終極寬鬆的吸附判定，解決「天」字這種細長部件的問題
                         if (r.layout === "LR") {
-                            if (node1_cx < node2_cx + 50) isValid = true; 
+                            if (node1_cx < node2_cx + 60) isValid = true; 
                         } else if (r.layout === "TB") {
-                            if (node1_cy < node2_cy + 50) isValid = true; 
+                            if (node1_cy < node2_cy + 60) isValid = true; 
                         }
                     }
 
@@ -829,41 +717,26 @@
                 let dx = cxB - cxA;
                 let dy = cyB - cyA;
                 let errorLabel = Math.abs(dx) > Math.abs(dy) ? "L/R" : "T/B";
-                
                 wrongRecords.push(`${charA}+${charB}(${errorLabel})`); 
 
                 cauldron.classList.add('error-anim');
                 document.getElementById('speech-bubble').innerText = "哎呀！拼錯了，部件已退回！";
                 
-                // 🔥 強化拼錯特效：兩個部件一起縮小旋轉消失
-                pA.style.transition = 'all 0.4s cubic-bezier(0.5, 0, 0.2, 1)';
-                pB.style.transition = 'all 0.4s cubic-bezier(0.5, 0, 0.2, 1)';
-                pA.style.transform = 'scale(0) rotate(180deg)';
-                pA.style.opacity = '0';
-                pB.style.transform = 'scale(0) rotate(180deg)';
-                pB.style.opacity = '0';
+                // 🔥 強化的雙重煙滅消失特效
+                pA.classList.add('vanish-anim');
+                pB.classList.add('vanish-anim');
                 
                 setTimeout(() => {
                     cauldron.classList.remove('error-anim');
                     
-                    // 從大鍋中徹底拔除
-                    pA.remove();
-                    pB.remove();
-                    
-                    // 清除殘留樣式
-                    pA.style.transition = '';
-                    pB.style.transition = '';
-                    pA.style.transform = '';
-                    pA.style.opacity = '';
-                    pB.style.transform = '';
-                    pB.style.opacity = '';
+                    pA.classList.remove('vanish-anim');
+                    pB.classList.remove('vanish-anim');
 
-                    // 退回積木庫並洗牌
                     resetPart(pA);
                     resetPart(pB);
                     cauldronParts = [];
 
-                    // 🔥 重生特效：在積木庫中重新放大彈出
+                    // 積木回到庫存區時彈出重生
                     pA.classList.add('respawn-anim');
                     pB.classList.add('respawn-anim');
                     setTimeout(() => {
@@ -871,7 +744,7 @@
                         pB.classList.remove('respawn-anim');
                     }, 400);
 
-                }, 400); // 等待消失動畫播完
+                }, 400); 
             }
         }
 
