@@ -76,9 +76,6 @@
         .energy-bar-bg { background-color: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden; position: relative; }
         .energy-bar-fill { background: linear-gradient(90deg, #ff7e5f, #feb47b); height: 100%; width: 0%; border-radius: 10px; transition: width 0.5s ease-out; }
 
-        /* =========================================
-           🔥 嚴格 50% / 50% 上下黃金比例 🔥
-           ========================================= */
         #game-board {
             flex: 1 1 auto;
             display: flex;
@@ -90,7 +87,6 @@
             height: calc(100dvh - 65px);
         }
 
-        /* 上半部：佔 50% */
         #play-area {
             flex: 0 0 50%;
             display: flex;
@@ -106,11 +102,9 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.04); box-sizing: border-box;
         }
 
-        /* 上半部內部 50% / 50% 分割（怪獸區 vs 大鍋區） */
         #left-panel { flex: 1; justify-content: center; position: relative; background: transparent; box-shadow: none; padding: 0; }
         #center-panel { flex: 1; justify-content: flex-start; border: 2px dashed #cbd5e0; background: #f8fafc; }
         
-        /* 下半部：佔 50%，專屬獨立滑動的積木庫（解開高度限制，確保滑動完美） */
         #right-panel { 
             flex: 0 0 50%; 
             display: flex; 
@@ -129,7 +123,6 @@
         #cauldron { flex-grow: 1; width: 100%; border-radius: 10px; position: relative; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
 
-        /* 🔥 超級寬大、絕對順暢的滾動容器與拉條 */
         #parts-container {
             flex: 1 1 auto; 
             width: 100%; 
@@ -138,7 +131,7 @@
             align-content: flex-start; 
             gap: 10px; 
             overflow-y: auto !important; 
-            -webkit-overflow-scrolling: touch; /* 支援手機平滑滑動 */
+            -webkit-overflow-scrolling: touch; 
             padding-right: 12px; 
             padding-bottom: 40px; 
             box-sizing: border-box;
@@ -161,10 +154,8 @@
         .part:hover { background: #f6e05e; color: #2d3748; box-shadow: 0 3px 0 #d69e2e, 0 5px 6px rgba(0,0,0,0.1); }
         .part.dragging { box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 9999 !important; background: #f6e05e !important; border: 3px solid #d69e2e !important; color: #2d3748 !important; }
 
-        /* 怪獸尺寸配置與向下微移 */
         #monster-svg { width: clamp(120px, 25vh, 180px); height: clamp(120px, 25vh, 180px); overflow: visible; transform: translateY(6px); }
 
-        /* 鼓勵話語設定 */
         .speech-bubble {
             background: white; border: 2px solid #e2e8f0; border-radius: 12px;
             font-weight: bold; color: #2d3748; position: relative; padding: 6px 14px;
@@ -215,18 +206,53 @@
         @keyframes respawnAnim { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
         .respawn-anim { animation: respawnAnim 0.4s forwards !important; }
 
-        #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 3000; }
-        #modal-box { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 85%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        #modal-box h2 { color: #e53e3e; font-size: 1.6rem; margin-top: 0; margin-bottom: 10px; }
+        /* 通用彈窗與開場警告彈窗 */
+        #modal-overlay, #intro-overlay { 
+            display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 4000; 
+        }
+        #modal-box, #intro-box { 
+            background: white; padding: 25px; border-radius: 20px; text-align: center; 
+            width: 85%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
+        }
+        #modal-box h2, #intro-box h2 { color: #e53e3e; font-size: 1.6rem; margin-top: 0; margin-bottom: 10px; }
+        
         .score-board { background: #f8fafc; border: 2px dashed #cbd5e0; border-radius: 12px; padding: 12px; margin-bottom: 15px; }
         .score-board p { margin: 4px 0; font-size: 1.1rem; font-weight: bold; color: #4a5568; }
+        
         #modal-box input { font-size: 1.1rem; padding: 10px; margin: 8px 0 15px 0; width: 85%; border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s; }
         #modal-box input:focus { border-color: #8b5cf6; }
-        #modal-submit-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; padding: 10px 25px; font-size: 1.05rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
-        #play-again-btn { background: #48bb78; color: white; border: none; padding: 10px 25px; font-size: 1.05rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; display: none; margin-top: 10px; }
+        
+        .modal-btn { 
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; 
+            padding: 12px 25px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; 
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); transition: 0.2s;
+        }
+        .modal-btn:hover { background: linear-gradient(135deg, #8b5cf6, #7c3aed); transform: translateY(-2px); }
+        
+        #play-again-btn { 
+            background: #48bb78; color: white; border: none; padding: 12px 25px; 
+            font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; 
+            display: none; margin-top: 10px; box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3); 
+        }
+        #play-again-btn:hover { background: #38a169; }
     </style>
 </head>
 <body>
+
+    <!-- 🔥 開場警告提示頁面 -->
+    <div id="intro-overlay">
+        <div id="intro-box">
+            <h2>⚠️ Game Rules & Warning</h2>
+            <div style="background: #fff5f5; border: 2px dashed #fc8181; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: left; color: #c53030; font-size: 0.95rem; line-height: 1.5;">
+                <p style="margin: 0 0 8px 0; font-weight: bold;">🧩 Objective:</p>
+                <p style="margin: 0 0 12px 0;">Drag and drop parts into the Magic Drop Zone to form complete Chinese characters.</p>
+                <p style="margin: 0 0 8px 0; font-weight: bold;">⚠️ Important Notice:</p>
+                <p style="margin: 0;">Each character can <b>only be formed once</b>! You cannot repeat a character once it has been successfully created.</p>
+            </div>
+            <button class="modal-btn" onclick="startGame()">Start Game 🚀</button>
+        </div>
+    </div>
 
     <header>
         <div class="header-top">
@@ -348,7 +374,7 @@
             </div>
             <p style="color: #718096; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem;">Enter your name to submit your score:</p>
             <input type="text" id="student-name" placeholder="e.g., Alex">
-            <button id="modal-submit-btn" onclick="submitScore()">Submit Score to Teacher</button>
+            <button class="modal-btn" id="modal-submit-btn" onclick="submitScore()">Submit Score to Teacher</button>
             <button id="play-again-btn" onclick="location.reload()">Play Again</button>
             <p id="submit-msg" style="font-weight:bold; margin-top:12px; font-size: 0.9rem;"></p>
         </div>
@@ -448,13 +474,20 @@
         let wrongRecords = []; 
         let cauldronParts = []; 
         
-        let startTime = Date.now();
-        let timerInterval = setInterval(() => {
-            let diff = Math.floor((Date.now() - startTime) / 1000);
-            let m = String(Math.floor(diff / 60)).padStart(2, '0');
-            let s = String(diff % 60).padStart(2, '0');
-            document.getElementById('timer').innerText = m + ':' + s;
-        }, 1000);
+        let startTime = null;
+        let timerInterval = null;
+
+        // 🔥 點擊開場按鈕後開始遊戲與計時
+        function startGame() {
+            document.getElementById('intro-overlay').style.display = 'none';
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                let diff = Math.floor((Date.now() - startTime) / 1000);
+                let m = String(Math.floor(diff / 60)).padStart(2, '0');
+                let s = String(diff % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = m + ':' + s;
+            }, 1000);
+        }
 
         const partsContainer = document.getElementById('parts-container');
         function initParts() {
@@ -620,9 +653,15 @@
                         isValid = true;
                     } else {
                         if (r.layout === "LR") {
-                            if (node1_cx < node2_cx + 60) isValid = true; 
+                            if (Math.abs(node1_cy - node2_cy) < 120) {
+                                if (charA === r.p1 && cxA < cxB) isValid = true;
+                                if (charA === r.p2 && cxB < cxA) isValid = true;
+                            }
                         } else if (r.layout === "TB") {
-                            if (node1_cy < node2_cy + 60) isValid = true; 
+                            if (Math.abs(node1_cx - node2_cx) < 120) {
+                                if (charA === r.p1 && cyA < cyB) isValid = true;
+                                if (charA === r.p2 && cyB < cyA) isValid = true;
+                            }
                         }
                     }
 
