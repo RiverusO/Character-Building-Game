@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Monster Evolution: Chinese Radicals</title>
     <style>
-        /* 🔥 核心升級：鎖死整個網頁的滾動，使用 100dvh 確保完美貼合手機螢幕 */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f7fe; 
@@ -22,7 +21,6 @@
             -webkit-user-select: none;
         }
 
-        /* 頂部資訊列：不重疊、不浮動，乖乖待在最上面 */
         header {
             flex: 0 0 auto;
             padding: 10px 15px;
@@ -41,6 +39,7 @@
             align-items: center;
             gap: 15px;
             flex-wrap: wrap;
+            width: 100%;
         }
 
         .stage-pill {
@@ -75,16 +74,15 @@
         #end-game-btn { background: #e53e3e; box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3); }
         #end-game-btn:hover { background: #c53030; transform: translateY(-2px); }
 
-        .energy-container { display: flex; flex-direction: column; gap: 4px; min-width: 200px; flex: 1; }
+        .energy-container { display: flex; flex-direction: column; gap: 4px; min-width: 200px; flex: 1; margin-top: 5px; }
         .energy-labels { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold; color: #718096; }
         .energy-bar-bg { background-color: #e2e8f0; height: 12px; border-radius: 10px; overflow: hidden; position: relative; }
         .energy-bar-fill { background: linear-gradient(90deg, #ff7e5f, #feb47b); height: 100%; width: 0%; border-radius: 10px; transition: width 0.5s ease-out; }
 
-        /* 🔥 遊戲主要區域：切割為「遊玩區(怪獸+鍋子)」與「積木區」 */
         #game-board {
             flex: 1 1 auto;
             display: flex;
-            overflow: hidden; /* 遊戲大框架絕對禁止滾動 */
+            overflow: hidden; 
             padding: 10px;
             gap: 10px;
             box-sizing: border-box;
@@ -116,7 +114,6 @@
         #cauldron { flex-grow: 1; width: 100%; border-radius: 15px; position: relative; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
 
-        /* 🔥 專屬滾動區：只有這裡可以上下滑動！ */
         #parts-container {
             flex: 1 1 auto; width: 100%; display: flex; flex-wrap: wrap; align-content: flex-start; 
             gap: 8px; overflow-y: auto; padding-right: 5px; padding-bottom: 30px; position: relative;
@@ -129,7 +126,7 @@
             background: #48bb78; color: #ffffff; font-size: 1.8rem; font-weight: normal;
             width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;
             border-radius: 12px; box-shadow: 0 4px 0 #38a169, 0 6px 8px rgba(0,0,0,0.1); 
-            touch-action: none; /* 🔥 禁止積木拖曳時觸發網頁滾動 */
+            touch-action: none; 
             z-index: 10; transition: transform 0.1s, box-shadow 0.1s, background 0.15s; cursor: pointer;
         }
 
@@ -137,39 +134,39 @@
         .part.dragging { box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 9999 !important; background: #f6e05e !important; border: 3px solid #d69e2e !important; color: #2d3748 !important; }
 
         /* =========================================
-           🔥 手機直向模式 (App 級上下鎖定分割) 🔥
+           🔥 手機直向模式：怪獸恢復大比例！
            ========================================= */
         @media (orientation: portrait) {
             #game-board { flex-direction: column; }
-            /* 上半部鎖死高度，怪獸跟鍋子排排站 */
-            #play-area { flex: 0 0 160px; flex-direction: row; }
+            /* 讓上方區域長高，容納大怪獸 */
+            #play-area { flex: 0 0 35vh; min-height: 200px; flex-direction: row; }
             #left-panel { flex: 1; padding: 5px; }
-            #center-panel { flex: 1.2; padding: 5px; }
+            #center-panel { flex: 1; padding: 5px; }
             
-            #monster-svg { width: 100px; height: 100px; }
-            .speech-bubble { font-size: 0.75rem; padding: 4px 10px; margin-bottom: 2px; }
-            .panel-title { font-size: 0.95rem; margin-bottom: 2px; }
-            .panel-subtitle { display: none; } /* 隱藏副標題節省空間 */
+            /* 使用 clamp 讓怪獸動態縮放，但保持大尺寸 */
+            #monster-svg { width: clamp(140px, 40vw, 220px); height: clamp(140px, 40vw, 220px); }
+            
+            .speech-bubble { font-size: 0.85rem; padding: 6px 12px; margin-bottom: 5px; position: relative; top: 0; left: 0; transform: none; animation: float 3s ease-in-out infinite; }
+            .panel-title { font-size: 1rem; margin-bottom: 2px; }
+            .panel-subtitle { display: none; } 
         }
 
         /* =========================================
-           🔥 手機橫向 / 電腦版模式 (左右完美排列) 🔥
+           🔥 手機橫向 / 電腦版模式
            ========================================= */
         @media (orientation: landscape) {
             #game-board { flex-direction: row; }
             #play-area { flex-direction: row; flex: 2; }
             #right-panel { flex: 1.5; }
-            #monster-svg { width: 160px; height: 160px; }
+            #monster-svg { width: clamp(160px, 20vw, 240px); height: clamp(160px, 20vw, 240px); }
             .speech-bubble { font-size: 0.9rem; padding: 8px 15px; margin-bottom: 10px; }
-            /* 如果橫向螢幕非常窄 (手機橫拿) */
             @media (max-height: 500px) {
-                #monster-svg { width: 100px; height: 100px; }
+                #monster-svg { width: 110px; height: 110px; }
                 .speech-bubble { font-size: 0.75rem; padding: 4px 8px; margin-bottom: 5px; }
                 .part { width: 45px; height: 45px; font-size: 1.5rem; }
             }
         }
 
-        /* 動畫特效區 */
         .speech-bubble {
             background: white; border: 2px solid #e2e8f0; border-radius: 20px;
             font-weight: bold; color: #4a5568; position: relative;
@@ -240,11 +237,15 @@
                 <span class="timer-display">⏱️ <span id="timer">00:00</span></span>
             </div>
             <div class="btn-group">
-                <button id="fullscreen-btn" class="action-btn" onclick="toggleFullScreen()">⛶ 全螢幕</button>
-                <button id="end-game-btn" class="action-btn" onclick="endGame(false)">🛑 結束</button>
+                <button id="fullscreen-btn" class="action-btn" onclick="toggleFullScreen()">⛶ Full Screen</button>
+                <button id="end-game-btn" class="action-btn" onclick="endGame(false)">🛑 End Game</button>
             </div>
         </div>
         <div class="energy-container">
+            <div class="energy-labels">
+                <span>🔋 Evolution Energy</span>
+                <span id="energy-percent">0%</span>
+            </div>
             <div class="energy-bar-bg">
                 <div class="energy-bar-fill" id="energy-bar"></div>
             </div>
@@ -340,15 +341,15 @@
 
     <div id="modal-overlay">
         <div id="modal-box">
-            <h2 id="modal-title">🎉 終極進化完成！</h2>
+            <h2 id="modal-title">🎉 Ultimate Evolution Complete!</h2>
             <div class="score-board">
-                <p>🏆 答對題數：<span id="final-score" style="color: #e53e3e; font-size: 1.5rem;">0</span> / 31</p>
-                <p>⏱️ 作答時間：<span id="final-time" style="color: #3182ce;">00:00</span></p>
+                <p>🏆 Correct: <span id="final-score" style="color: #e53e3e; font-size: 1.5rem;">0</span> / 31</p>
+                <p>⏱️ Time Taken: <span id="final-time" style="color: #3182ce;">00:00</span></p>
             </div>
-            <p style="color: #718096; font-weight: bold; margin-bottom: 5px;">請輸入你的名字傳給老師：</p>
-            <input type="text" id="student-name" placeholder="例如：王小明">
-            <button id="modal-submit-btn" onclick="submitScore()">送出成績</button>
-            <button id="play-again-btn" onclick="location.reload()">再玩一次</button>
+            <p style="color: #718096; font-weight: bold; margin-bottom: 5px;">Please enter your name for the teacher:</p>
+            <input type="text" id="student-name" placeholder="e.g., Jin">
+            <button id="modal-submit-btn" onclick="submitScore()">Submit Score</button>
+            <button id="play-again-btn" onclick="location.reload()">Play Again</button>
             <p id="submit-msg" style="font-weight:bold; margin-top:15px;"></p>
         </div>
     </div>
@@ -404,7 +405,7 @@
         document.getElementById('total-count').innerText = TOTAL_RECIPES;
 
         const stages = [
-            { score: 0, class: "monster-stage-0", name: "Stage 0: Cute Blob" },
+            { score: 0, class: "monster-stage-0", name: "Stage 0: Cute Egg" },
             { score: 8, class: "monster-stage-1", name: "Stage 1: Growing Horns" },
             { score: 16, class: "monster-stage-2", name: "Stage 2: Winged Monster" },
             { score: 24, class: "monster-stage-3", name: "Stage 3: Magic Wand" },
@@ -412,16 +413,16 @@
         ];
 
         const standardCheers = [
-            "太棒了！繼續保持！", "你做得超棒！", "完全正確！你太聰明了！",
-            "幹得好！再給我一點！", "就是這樣拼！", "非常漂亮的組合！",
-            "你真是個漢字天才！", "哇！你完美找出來了！"
+            "Excellent job!", "You're doing fantastic!", "Spot on! Brilliant!",
+            "Keep up the great work!", "That's exactly right!", "Perfect match!",
+            "You're a natural at this!", "Outstanding!"
         ];
         
         const stageUpCheers = [
-            "哇！你看，我長出金牛角了！", 
-            "太神奇了！我長出翅膀了！你最棒！", 
-            "我有手腳了！繼續餵我吃字！", 
-            "吼！！！我全身起火啦！！！滿分達成！" 
+            "Wow! Look, I'm growing horns!", 
+            "Amazing! I've got my wings! You're the best!", 
+            "I have arms and legs now! Keep feeding me!", 
+            "ROAAAAR!!! I am ON FIRE!!! Perfect score!" 
         ];
 
         const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
@@ -463,14 +464,14 @@
                 if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                     if (elem.requestFullscreen) { elem.requestFullscreen(); } 
                     else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen(); }
-                    btn.innerText = "✖ 退出全螢幕";
+                    btn.innerText = "✖ Exit Full Screen";
                 } else {
                     if (document.exitFullscreen) { document.exitFullscreen(); } 
                     else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
-                    btn.innerText = "⛶ 全螢幕";
+                    btn.innerText = "⛶ Full Screen";
                 }
             } catch (err) {
-                alert("抱歉，您的手機瀏覽器安全設定目前不支援全螢幕功能。");
+                alert("Sorry, your mobile browser settings do not support full-screen mode.");
             }
         }
 
@@ -488,7 +489,6 @@
             draggedItem.classList.add('dragging');
             document.body.appendChild(draggedItem); 
             
-            // 🔥 使用 Fixed 固定座標，不受任何滾動影響，徹底解決積木亂飛
             draggedItem.style.position = 'fixed';
             draggedItem.style.zIndex = '9999';
             moveAt(e);
@@ -540,7 +540,7 @@
                     cauldronParts.push(draggedItem);
                 }
                 
-                draggedItem.style.position = 'absolute'; // 進鍋子後改回相對定位
+                draggedItem.style.position = 'absolute';
                 draggedItem.style.left = (clientX - cauldronRect.left - draggedItem.offsetWidth/2) + 'px';
                 draggedItem.style.top = (clientY - cauldronRect.top - draggedItem.offsetHeight/2) + 'px';
                 
@@ -604,7 +604,6 @@
                     if (r.p1 === r.p2) {
                         isValid = true;
                     } else {
-                        // 🔥 終極寬鬆的吸附判定，確保「天」字完美結合
                         if (r.layout === "LR") {
                             if (node1_cx < node2_cx + 60) isValid = true; 
                         } else if (r.layout === "TB") {
@@ -680,9 +679,8 @@
                 wrongRecords.push(`${charA}+${charB}(${errorLabel})`); 
 
                 cauldron.classList.add('error-anim');
-                document.getElementById('speech-bubble').innerText = "哎呀！拼錯了，部件已退回！";
+                document.getElementById('speech-bubble').innerText = "Oops! That's not a match. Try again!";
                 
-                // 🔥 確保兩個部件「一起」旋轉縮小消失
                 pA.classList.add('vanish-anim');
                 pB.classList.add('vanish-anim');
                 
@@ -696,7 +694,6 @@
                     resetPart(pB);
                     cauldronParts = [];
 
-                    // 🔥 回到積木區「一起」彈出重生
                     pA.classList.add('respawn-anim');
                     pB.classList.add('respawn-anim');
                     setTimeout(() => {
@@ -741,19 +738,19 @@
             document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
 
             if(isWin) {
-                document.getElementById('modal-title').innerText = "🔥 終極進化完成！ 🔥";
+                document.getElementById('modal-title').innerText = "🎉 Ultimate Evolution Complete!";
             } else {
-                document.getElementById('modal-title').innerText = "🏁 遊戲結束！";
+                document.getElementById('modal-title').innerText = "🏁 Game Over!";
                 document.getElementById('modal-title').style.color = "#4a5568";
             }
         }
 
         function submitScore() {
             let name = document.getElementById('student-name').value;
-            if(!name) { alert("請輸入你的名字！"); return; }
+            if(!name) { alert("Please enter your name!"); return; }
             
             let btn = document.getElementById('modal-submit-btn');
-            btn.innerText = "傳送中...";
+            btn.innerText = "Submitting...";
             btn.disabled = true;
 
             const formData = new URLSearchParams();
@@ -778,15 +775,15 @@
                 mode: 'no-cors', 
                 body: formData
             }).then(() => {
-                document.getElementById('submit-msg').innerText = "✅ 成績已成功傳送給老師！";
+                document.getElementById('submit-msg').innerText = "✅ Score submitted successfully!";
                 document.getElementById('submit-msg').style.color = "#48bb78";
                 btn.style.display = "none";
                 document.getElementById('play-again-btn').style.display = "inline-block";
             }).catch(err => {
                 console.error(err);
-                document.getElementById('submit-msg').innerText = "❌ 傳送失敗，請檢查網路連線。";
+                document.getElementById('submit-msg').innerText = "❌ Failed to submit. Please check your connection.";
                 document.getElementById('submit-msg').style.color = "#fc8181";
-                btn.innerText = "再試一次";
+                btn.innerText = "Try Again";
                 btn.disabled = false;
             });
         }
