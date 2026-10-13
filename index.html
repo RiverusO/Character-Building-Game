@@ -20,7 +20,6 @@
             -webkit-user-select: none;
         }
 
-        /* 🔥 標頭凍結：確保手機捲動時，計時器與進度條永遠置頂可見 */
         header {
             position: sticky;
             top: 0;
@@ -247,8 +246,6 @@
 
         .part:hover { background: #f6e05e; color: #2d3748; box-shadow: 0 4px 0 #d69e2e, 0 6px 8px rgba(0,0,0,0.1); }
         .part:active { transform: scale(0.95) translateY(4px); box-shadow: 0 0 0 #d69e2e, 0 3px 4px rgba(0,0,0,0.1); }
-        
-        /* 🔥 確保拖曳中的積木圖層高於標頭，不會被標頭蓋住 */
         .part.dragging {
             box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 2000 !important;
             background: #f6e05e !important; border: 3px solid #d69e2e !important; color: #2d3748 !important;
@@ -299,7 +296,6 @@
         }
         #play-again-btn:hover { background: #38a169; }
 
-        /* 🔥 手機版 UI 微調，確保資訊列不會擠成一團 */
         @media (max-width: 600px) {
             .energy-labels { font-size: 0.8rem; }
             .stage-pill { padding: 4px 10px; font-size: 0.9rem; }
@@ -595,11 +591,11 @@
         }
 
         function moveAt(e) {
-            let clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
-            let clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            let pageX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+            let pageY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
             draggedItem.style.position = 'absolute';
-            draggedItem.style.left = (clientX - draggedItem.offsetWidth/2) + 'px';
-            draggedItem.style.top = (clientY - draggedItem.offsetHeight/2) + 'px';
+            draggedItem.style.left = (pageX - draggedItem.offsetWidth/2) + 'px';
+            draggedItem.style.top = (pageY - draggedItem.offsetHeight/2) + 'px';
         }
 
         function dragMove(e) {
@@ -654,7 +650,15 @@
         }
 
         function resetPart(part) {
-            partsContainer.appendChild(part);
+            // 🔥 拼錯回歸：隨機安插回庫存中，不再只擠到底部
+            let children = partsContainer.children;
+            if (children.length > 0) {
+                let randomIndex = Math.floor(Math.random() * children.length);
+                partsContainer.insertBefore(part, children[randomIndex]);
+            } else {
+                partsContainer.appendChild(part);
+            }
+            
             part.style.position = '';
             part.style.left = '';
             part.style.top = '';
@@ -689,19 +693,13 @@
 
                     let isValid = false;
                     
-                    // 🔥 智慧象限判定：不只看距離，而是看嚴格的相對位置（左右、上下）
-                    let dx = node2_cx - node1_cx; // dx>0 代表 Node 2 在 Node 1 的右邊
-                    let dy = node2_cy - node1_cy; // dy>0 代表 Node 2 在 Node 1 的下面
-                    
                     if (r.p1 === r.p2) {
-                        isValid = true; // 兩個部件相同（例如：朋、多），無所謂順序
+                        isValid = true;
                     } else {
                         if (r.layout === "LR") {
-                            // Node 2 必須在 Node 1 的「右側」，且水平距離大於垂直距離的一半 (允許些微上下歪斜)
-                            if (dx > 0 && Math.abs(dx) >= Math.abs(dy) * 0.5) isValid = true; 
+                            if (node1_cx <= node2_cx + 50) isValid = true; 
                         } else if (r.layout === "TB") {
-                            // Node 2 必須在 Node 1 的「下方」，且垂直距離大於水平距離的一半 (允許些微左右歪斜)
-                            if (dy > 0 && Math.abs(dy) >= Math.abs(dx) * 0.5) isValid = true; 
+                            if (node1_cy <= node2_cy + 50) isValid = true; 
                         }
                     }
 
@@ -770,8 +768,25 @@
                 cauldron.classList.add('error-anim');
                 document.getElementById('speech-bubble').innerText = "Oops! Try again.";
                 
+                // 🔥 拼錯消失特效：把拖曳的部件縮小隱藏
+                pA.style.transition = 'all 0.3s ease';
+                pB.style.transition = 'all 0.3s ease';
+                pA.style.transform = 'scale(0)';
+                pA.style.opacity = '0';
+                pB.style.transform = 'scale(0)';
+                pB.style.opacity = '0';
+                
                 setTimeout(() => {
                     cauldron.classList.remove('error-anim');
+                    
+                    // 清除消失的 CSS 樣式，恢復預設
+                    pA.style.transition = '';
+                    pB.style.transition = '';
+                    pA.style.transform = '';
+                    pA.style.opacity = '';
+                    pB.style.transform = '';
+                    pB.style.opacity = '';
+
                     resetPart(pA);
                     resetPart(pB);
                     cauldronParts = [];
