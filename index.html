@@ -273,9 +273,16 @@
             background: white; padding: 30px; border-radius: 20px; text-align: center;
             width: 85%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
-        #modal-box h2 { color: #2d3748; margin-top: 0; }
+        #modal-box h2 { color: #e53e3e; font-size: 1.8rem; margin-top: 0; margin-bottom: 10px; }
+        
+        .score-board {
+            background: #f8fafc; border: 2px dashed #cbd5e0; border-radius: 12px;
+            padding: 15px; margin-bottom: 20px;
+        }
+        .score-board p { margin: 5px 0; font-size: 1.2rem; font-weight: bold; color: #4a5568; }
+        
         #modal-box input {
-            font-size: 1.1rem; padding: 12px; margin: 15px 0; width: 85%;
+            font-size: 1.1rem; padding: 12px; margin: 10px 0 20px 0; width: 85%;
             border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s;
         }
         #modal-box input:focus { border-color: #8b5cf6; }
@@ -339,7 +346,7 @@
                 <span>Progress: <span id="score-count">0</span> / <span id="total-count">31</span></span>
                 <span class="timer-display">⏱️ <span id="timer">00:00</span></span>
             </div>
-            <button id="end-game-btn" onclick="endGame(false)">🛑 End Game</button>
+            <button id="end-game-btn" onclick="endGame(false)">🛑 結束遊戲</button>
         </div>
         <div class="energy-container">
             <div class="energy-labels">
@@ -455,14 +462,21 @@
         </div>
     </div>
 
+    <!-- 🔥 重新設計的結算彈窗 -->
     <div id="modal-overlay">
         <div id="modal-box">
-            <h2 id="modal-title">🎉 Game Over!</h2>
-            <p style="color: #718096; margin-bottom: 5px;">Please enter your name:</p>
-            <input type="text" id="student-name" placeholder="e.g., Jin">
-            <br>
-            <button id="modal-submit-btn" onclick="submitScore()">Send to Teacher</button>
-            <button id="play-again-btn" onclick="location.reload()">Play Again</button>
+            <h2 id="modal-title">🎉 太厲害了！</h2>
+            
+            <div class="score-board">
+                <p>🏆 答對題數：<span id="final-score" style="color: #e53e3e; font-size: 1.5rem;">0</span> / 31</p>
+                <p>⏱️ 作答時間：<span id="final-time" style="color: #3182ce;">00:00</span></p>
+            </div>
+
+            <p style="color: #718096; font-weight: bold; margin-bottom: 5px;">請輸入你的名字傳給老師：</p>
+            <input type="text" id="student-name" placeholder="例如：王小明">
+            
+            <button id="modal-submit-btn" onclick="submitScore()">送出成績</button>
+            <button id="play-again-btn" onclick="location.reload()">再玩一次</button>
             <p id="submit-msg" style="font-weight:bold; margin-top:15px;"></p>
         </div>
     </div>
@@ -526,16 +540,16 @@
         ];
 
         const standardCheers = [
-            "Great job! Keep it up!", "You're doing amazing!", "Spot on! You are a genius!",
-            "Fantastic work! Feed me more!", "That's exactly right!", "Brilliant move!",
-            "You're a natural at this!", "Wow, you figured it out perfectly!"
+            "太棒了！繼續保持！", "你做得超棒！", "完全正確！你太聰明了！",
+            "幹得好！再多給我一點！", "就是這樣拼！", "非常漂亮的組合！",
+            "你真是個漢字天才！", "哇！你完美找出來了！"
         ];
         
         const stageUpCheers = [
-            "Wow! Look at me, I'm growing horns!", 
-            "Amazing! I got my wings! You're the best!", 
-            "I have hands now! Keep feeding me!", 
-            "ROAAAAR!!! I am ON FIRE!!! Perfect score!" 
+            "哇！你看，我長出金牛角了！", 
+            "太神奇了！我長出翅膀了！你最棒！", 
+            "我有手腳了！繼續餵我吃字！", 
+            "吼！！！我全身起火啦！！！滿分達成！" 
         ];
 
         const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
@@ -650,7 +664,6 @@
         }
 
         function resetPart(part) {
-            // 🔥 拼錯回歸：隨機安插回庫存中，不再只擠到底部
             let children = partsContainer.children;
             if (children.length > 0) {
                 let randomIndex = Math.floor(Math.random() * children.length);
@@ -753,7 +766,14 @@
                         }, 500);
 
                         updateProgress();
-                        if(score === TOTAL_RECIPES) endGame(true);
+                        
+                        // 🔥 滿分延遲觸發：凍結計時器，給學生 3 秒鐘欣賞燃燒怪獸的成就感！
+                        if(score === TOTAL_RECIPES) {
+                            clearInterval(timerInterval);
+                            setTimeout(() => {
+                                endGame(true);
+                            }, 3000); 
+                        }
                     }, 600);
                 }, 800);
 
@@ -766,9 +786,8 @@
                 wrongRecords.push(`${charA}+${charB}(${errorLabel})`); 
 
                 cauldron.classList.add('error-anim');
-                document.getElementById('speech-bubble').innerText = "Oops! Try again.";
+                document.getElementById('speech-bubble').innerText = "哎呀！拼錯了，再試一次。";
                 
-                // 🔥 拼錯消失特效：把拖曳的部件縮小隱藏
                 pA.style.transition = 'all 0.3s ease';
                 pB.style.transition = 'all 0.3s ease';
                 pA.style.transform = 'scale(0)';
@@ -778,8 +797,6 @@
                 
                 setTimeout(() => {
                     cauldron.classList.remove('error-anim');
-                    
-                    // 清除消失的 CSS 樣式，恢復預設
                     pA.style.transition = '';
                     pB.style.transition = '';
                     pA.style.transform = '';
@@ -810,10 +827,8 @@
             if (newStageIndex > currentStageIndex) {
                 document.getElementById('speech-bubble').innerText = stageUpCheers[newStageIndex - 1];
                 currentStageIndex = newStageIndex;
-                
                 let monsterContainer = document.getElementById('monster-container');
                 monsterContainer.className = stages[currentStageIndex].class;
-                
             } else if (score < TOTAL_RECIPES) {
                 document.getElementById('speech-bubble').innerText = standardCheers[Math.floor(Math.random() * standardCheers.length)];
             }
@@ -822,21 +837,27 @@
         }
 
         function endGame(isWin) {
-            clearInterval(timerInterval);
+            clearInterval(timerInterval); // 確保提早結束時也會停止計時
             document.getElementById('modal-overlay').style.display = 'flex';
+            
+            // 🔥 將最終成績與時間更新到結算單上
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
+
             if(isWin) {
-                document.getElementById('modal-title').innerText = "🎉 All Stages Completed!";
+                document.getElementById('modal-title').innerText = "🔥 終極進化完成！ 🔥";
             } else {
-                document.getElementById('modal-title').innerText = `🏁 Game Ended! Score: ${score}`;
+                document.getElementById('modal-title').innerText = "🏁 遊戲結束！";
+                document.getElementById('modal-title').style.color = "#4a5568";
             }
         }
 
         function submitScore() {
             let name = document.getElementById('student-name').value;
-            if(!name) { alert("Please enter your name!"); return; }
+            if(!name) { alert("請輸入你的名字！"); return; }
             
             let btn = document.getElementById('modal-submit-btn');
-            btn.innerText = "Submitting...";
+            btn.innerText = "傳送中...";
             btn.disabled = true;
 
             const formData = new URLSearchParams();
@@ -861,15 +882,15 @@
                 mode: 'no-cors', 
                 body: formData
             }).then(() => {
-                document.getElementById('submit-msg').innerText = "✅ Submitted successfully!";
+                document.getElementById('submit-msg').innerText = "✅ 成績已成功傳送給老師！";
                 document.getElementById('submit-msg').style.color = "#48bb78";
                 btn.style.display = "none";
                 document.getElementById('play-again-btn').style.display = "inline-block";
             }).catch(err => {
                 console.error(err);
-                document.getElementById('submit-msg').innerText = "❌ Failed. Check connection.";
+                document.getElementById('submit-msg').innerText = "❌ 傳送失敗，請檢查網路連線。";
                 document.getElementById('submit-msg').style.color = "#fc8181";
-                btn.innerText = "Try Again";
+                btn.innerText = "再試一次";
                 btn.disabled = false;
             });
         }
