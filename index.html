@@ -11,7 +11,8 @@
             color: #2d3748;
             margin: 0;
             padding: 0;
-            height: 100vh; 
+            /* 🔥 升級為 dvh (動態視窗高度)，解決手機網址列吃掉底部的問題 */
+            height: 100dvh; 
             display: flex;
             flex-direction: column;
             overscroll-behavior: none; 
@@ -69,8 +70,13 @@
             border: 2px solid #e2e8f0;
         }
 
-        #end-game-btn {
-            background: #e53e3e;
+        /* 🔥 按鈕區塊 */
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
             color: white;
             border: none;
             padding: 8px 15px;
@@ -78,9 +84,13 @@
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
             transition: all 0.2s;
         }
+        
+        #fullscreen-btn { background: #4299e1; box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3); }
+        #fullscreen-btn:hover { background: #3182ce; transform: translateY(-2px); }
+
+        #end-game-btn { background: #e53e3e; box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3); }
         #end-game-btn:hover { background: #c53030; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(229, 62, 62, 0.4); }
 
         .energy-container {
@@ -116,7 +126,7 @@
             padding: 15px 20px;
             gap: 15px;
             box-sizing: border-box;
-            height: calc(100vh - 90px);
+            height: calc(100dvh - 90px);
         }
 
         .panel {
@@ -230,17 +240,10 @@
 
         #right-panel { flex: 1.5; display: flex; flex-direction: column; }
         
-        /* 🔥 核心修正：為積木庫底部墊出安全的呼吸空間，確保最後一排絕對不會被截斷 */
+        /* 🔥 加大底部防護墊，確保最後一排不會被吃掉 */
         #parts-container {
-            flex-grow: 1; 
-            width: 100%; 
-            display: flex; 
-            flex-wrap: wrap; 
-            align-content: flex-start; 
-            gap: 10px; 
-            overflow-y: auto; 
-            padding-right: 5px; 
-            padding-bottom: 50px; /* 增加底部空白距離 */
+            flex-grow: 1; width: 100%; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; overflow-y: auto; padding-right: 5px; 
+            padding-bottom: 120px; /* 大幅增加底部空間 */
             position: relative;
         }
         #parts-container::-webkit-scrollbar { width: 6px; }
@@ -275,12 +278,6 @@
             75% { transform: translateX(10px); }
         }
         .error-anim { animation: shake 0.4s; background: #fff5f5; border-color: #fc8181; color: #c53030; }
-
-        @keyframes vanishAnim {
-            0% { transform: scale(1) rotate(0deg); opacity: 1; }
-            100% { transform: scale(0) rotate(15deg); opacity: 0; filter: blur(2px); }
-        }
-        .vanish-anim { animation: vanishAnim 0.3s forwards !important; pointer-events: none; }
 
         @keyframes respawnAnim {
             0% { transform: scale(0); opacity: 0; }
@@ -334,20 +331,21 @@
             .timer-display { padding: 2px 8px; }
         }
 
-        /* 🔥 確保手機直向模式整個版面底部也有足夠空間 */
+        /* 手機直向模式 */
         @media (max-width: 900px) and (orientation: portrait) {
-            #game-board { flex-direction: column; overflow-y: auto; height: auto; padding-bottom: 80px; }
+            #game-board { flex-direction: column; overflow-y: auto; height: auto; }
             body { height: auto; overflow: auto; }
             #left-panel, #center-panel { min-height: 250px; }
         }
 
+        /* 手機橫向模式 */
         @media (max-height: 500px) and (orientation: landscape) {
             header { flex-direction: row; padding: 5px 15px; }
             .header-top { flex: 1; gap: 10px; }
             .energy-container { flex: 1; margin-left: 20px; }
             
-            #game-board { flex-direction: row; height: calc(100vh - 65px); padding: 5px 10px; gap: 10px; }
-            body { height: 100vh; overflow: hidden; }
+            #game-board { flex-direction: row; height: calc(100dvh - 65px); padding: 5px 10px; gap: 10px; }
+            body { height: 100dvh; overflow: hidden; }
             
             #left-panel, #center-panel { min-height: unset; flex: 1; }
             #right-panel { flex: 1.5; }
@@ -371,7 +369,11 @@
                 <span>Progress: <span id="score-count">0</span> / <span id="total-count">31</span></span>
                 <span class="timer-display">⏱️ <span id="timer">00:00</span></span>
             </div>
-            <button id="end-game-btn" onclick="endGame(false)">🛑 結束遊戲</button>
+            <div class="btn-group">
+                <!-- 🔥 新增全螢幕按鈕 -->
+                <button id="fullscreen-btn" class="action-btn" onclick="toggleFullScreen()">⛶ 全螢幕</button>
+                <button id="end-game-btn" class="action-btn" onclick="endGame(false)">🛑 結束</button>
+            </div>
         </div>
         <div class="energy-container">
             <div class="energy-labels">
@@ -607,6 +609,28 @@
         }
         initParts();
 
+        // 🔥 全螢幕切換功能
+        function toggleFullScreen() {
+            let elem = document.documentElement;
+            let btn = document.getElementById('fullscreen-btn');
+            
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* Safari 支援 */
+                    elem.webkitRequestFullscreen();
+                }
+                btn.innerText = "✖ 退出全螢幕";
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari 支援 */
+                    document.webkitExitFullscreen();
+                }
+                btn.innerText = "⛶ 全螢幕";
+            }
+        }
+
         let draggedItem = null;
         const cauldron = document.getElementById('cauldron');
 
@@ -734,9 +758,9 @@
                         isValid = true;
                     } else {
                         if (r.layout === "LR") {
-                            if (node1_cx < node2_cx + 40) isValid = true; 
+                            if (node1_cx < node2_cx + 50) isValid = true; 
                         } else if (r.layout === "TB") {
-                            if (node1_cy < node2_cy + 40) isValid = true; 
+                            if (node1_cy < node2_cy + 50) isValid = true; 
                         }
                     }
 
@@ -809,20 +833,37 @@
                 wrongRecords.push(`${charA}+${charB}(${errorLabel})`); 
 
                 cauldron.classList.add('error-anim');
-                document.getElementById('speech-bubble').innerText = "哎呀！拼錯了，再試一次。";
+                document.getElementById('speech-bubble').innerText = "哎呀！拼錯了，部件已退回！";
                 
-                pA.classList.add('vanish-anim');
-                pB.classList.add('vanish-anim');
+                // 🔥 強化拼錯特效：兩個部件一起縮小旋轉消失
+                pA.style.transition = 'all 0.4s cubic-bezier(0.5, 0, 0.2, 1)';
+                pB.style.transition = 'all 0.4s cubic-bezier(0.5, 0, 0.2, 1)';
+                pA.style.transform = 'scale(0) rotate(180deg)';
+                pA.style.opacity = '0';
+                pB.style.transform = 'scale(0) rotate(180deg)';
+                pB.style.opacity = '0';
                 
                 setTimeout(() => {
                     cauldron.classList.remove('error-anim');
-                    pA.classList.remove('vanish-anim');
-                    pB.classList.remove('vanish-anim');
+                    
+                    // 從大鍋中徹底拔除
+                    pA.remove();
+                    pB.remove();
+                    
+                    // 清除殘留樣式
+                    pA.style.transition = '';
+                    pB.style.transition = '';
+                    pA.style.transform = '';
+                    pA.style.opacity = '';
+                    pB.style.transform = '';
+                    pB.style.opacity = '';
 
+                    // 退回積木庫並洗牌
                     resetPart(pA);
                     resetPart(pB);
                     cauldronParts = [];
 
+                    // 🔥 重生特效：在積木庫中重新放大彈出
                     pA.classList.add('respawn-anim');
                     pB.classList.add('respawn-anim');
                     setTimeout(() => {
@@ -830,7 +871,7 @@
                         pB.classList.remove('respawn-anim');
                     }, 400);
 
-                }, 300);
+                }, 400); // 等待消失動畫播完
             }
         }
 
