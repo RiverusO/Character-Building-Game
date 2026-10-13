@@ -206,7 +206,6 @@
         @keyframes respawnAnim { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
         .respawn-anim { animation: respawnAnim 0.4s forwards !important; }
 
-        /* 通用彈窗與開場警告彈窗 */
         #modal-overlay, #intro-overlay { 
             display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 4000; 
@@ -220,8 +219,8 @@
         .score-board { background: #f8fafc; border: 2px dashed #cbd5e0; border-radius: 12px; padding: 12px; margin-bottom: 15px; }
         .score-board p { margin: 4px 0; font-size: 1.1rem; font-weight: bold; color: #4a5568; }
         
-        #modal-box input { font-size: 1.1rem; padding: 10px; margin: 8px 0 15px 0; width: 85%; border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s; }
-        #modal-box input:focus { border-color: #8b5cf6; }
+        #student-name { font-size: 1.1rem; padding: 10px; margin: 8px 0 15px 0; width: 85%; border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s; }
+        #student-name:focus { border-color: #8b5cf6; }
         
         .modal-btn { 
             background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; 
@@ -240,17 +239,18 @@
 </head>
 <body>
 
-    <!-- 🔥 開場警告提示頁面 -->
+    <!-- 🔥 開場名字輸入與規則提示頁面 -->
     <div id="intro-overlay">
         <div id="intro-box">
-            <h2>⚠️ Game Rules & Warning</h2>
-            <div style="background: #fff5f5; border: 2px dashed #fc8181; border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: left; color: #c53030; font-size: 0.95rem; line-height: 1.5;">
-                <p style="margin: 0 0 8px 0; font-weight: bold;">🧩 Objective:</p>
-                <p style="margin: 0 0 12px 0;">Drag and drop parts into the Magic Drop Zone to form complete Chinese characters.</p>
-                <p style="margin: 0 0 8px 0; font-weight: bold;">⚠️ Important Notice:</p>
-                <p style="margin: 0;">Each character can <b>only be formed once</b>! You cannot repeat a character once it has been successfully created.</p>
+            <h2>🚀 Welcome, Scholar!</h2>
+            <p style="color: #718096; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem;">Please enter your name:</p>
+            <input type="text" id="intro-student-name" placeholder="e.g., Alex">
+            
+            <div style="background: #fff5f5; border: 2px dashed #fc8181; border-radius: 12px; padding: 12px; margin: 15px 0; text-align: left; color: #c53030; font-size: 0.9rem; line-height: 1.4;">
+                <p style="margin: 0 0 6px 0; font-weight: bold;">⚠️ Game Rule:</p>
+                <p style="margin: 0;">Each character can <b>only be formed once</b>! Once a character is successfully created, you cannot repeat it. Mistakes will return your parts.</p>
             </div>
-            <button class="modal-btn" onclick="startGame()">Start Game 🚀</button>
+            <button class="modal-btn" onclick="startGame()">Start Game ✨</button>
         </div>
     </div>
 
@@ -365,18 +365,16 @@
         </div>
     </div>
 
-    <div id="modal-overlay">
+    <!-- 🔥 自動提交後的結算畫面 -->
+    <div id="modal-overlay" style="display: none;">
         <div id="modal-box">
-            <h2 id="modal-title">🚪 Score Portal</h2>
+            <h2 id="modal-title">🎉 Amazing Work!</h2>
             <div class="score-board">
                 <p>🏆 Correct Answers: <span id="final-score" style="color: #e53e3e; font-size: 1.4rem;">0</span> / 31</p>
                 <p>⏱️ Time Taken: <span id="final-time" style="color: #3182ce;">00:00</span></p>
             </div>
-            <p style="color: #718096; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem;">Enter your name to submit your score:</p>
-            <input type="text" id="student-name" placeholder="e.g., Alex">
-            <button class="modal-btn" id="modal-submit-btn" onclick="submitScore()">Submit Score to Teacher</button>
-            <button id="play-again-btn" onclick="location.reload()">Play Again</button>
-            <p id="submit-msg" style="font-weight:bold; margin-top:12px; font-size: 0.9rem;"></p>
+            <p id="submission-status" style="font-weight: bold; color: #48bb78; margin-bottom: 15px; font-size: 0.95rem;">✅ Score automatically sent to the teacher!</p>
+            <button class="modal-btn" id="play-again-btn" onclick="location.reload()" style="display: block;">Play Again ✨</button>
         </div>
     </div>
 
@@ -468,6 +466,7 @@
 
         const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
 
+        let studentName = "";
         let score = 0;
         let currentStageIndex = 0;
         let mistakes = 0;
@@ -477,9 +476,15 @@
         let startTime = null;
         let timerInterval = null;
 
-        // 🔥 點擊開場按鈕後開始遊戲與計時
         function startGame() {
+            let nameInput = document.getElementById('intro-student-name').value.trim();
+            if(!nameInput) {
+                alert("Please enter your name to start!");
+                return;
+            }
+            studentName = nameInput;
             document.getElementById('intro-overlay').style.display = 'none';
+
             startTime = Date.now();
             timerInterval = setInterval(() => {
                 let diff = Math.floor((Date.now() - startTime) / 1000);
@@ -574,7 +579,7 @@
         function dragEnd(e) {
             if (!draggedItem) return;
             let clientX = e.type.includes('mouse') ? e.clientX : e.changedTouches[0].clientX;
-            let clientY = e.type.includes('mouse') ? e.clientY : e.changedTouches[0].clientY;
+            let clientY = e.type.includes('mouse') ? e.changedTouches[0].clientY;
 
             let cauldronRect = cauldron.getBoundingClientRect();
             draggedItem.classList.remove('dragging');
@@ -785,9 +790,12 @@
         }
 
         function endGame(isWin) {
-            clearInterval(timerInterval); 
-            document.getElementById('modal-overlay').style.display = 'flex';
+            if(timerInterval) clearInterval(timerInterval); 
             
+            // 🔥 自動在背景提交成績到 Google 試算表
+            autoSubmitScore();
+
+            document.getElementById('modal-overlay').style.display = 'flex';
             document.getElementById('final-score').innerText = score;
             document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
 
@@ -799,19 +807,14 @@
             }
         }
 
-        function submitScore() {
-            let name = document.getElementById('student-name').value;
-            if(!name) { alert("Please enter your name!"); return; }
-            
-            let btn = document.getElementById('modal-submit-btn');
-            btn.innerText = "Submitting Score...";
-            btn.disabled = true;
+        function autoSubmitScore() {
+            if(!studentName) studentName = "Anonymous";
 
             const formData = new URLSearchParams();
             formData.append('score', score); 
-            formData.append('name', name);
-            formData.append('studentName', name);
-            formData.append('學生姓名', name);
+            formData.append('name', studentName);
+            formData.append('studentName', studentName);
+            formData.append('學生姓名', studentName);
             
             let wrongDetail = wrongRecords.length > 0 ? `${mistakes} mistakes (${wrongRecords.join(', ')})` : "Perfect";
             formData.append('wrongAnswers', wrongDetail); 
@@ -829,16 +832,10 @@
                 mode: 'no-cors', 
                 body: formData
             }).then(() => {
-                document.getElementById('submit-msg').innerText = "✅ Score successfully sent to the teacher!";
-                document.getElementById('submit-msg').style.color = "#48bb78";
-                btn.style.display = "none";
-                document.getElementById('play-again-btn').style.display = "inline-block";
+                document.getElementById('submission-status').innerText = "✅ Score successfully sent to the teacher!";
             }).catch(err => {
                 console.error(err);
-                document.getElementById('submit-msg').innerText = "❌ Submission failed. Please check your network connection.";
-                document.getElementById('submit-msg').style.color = "#fc8181";
-                btn.innerText = "Try Again";
-                btn.disabled = false;
+                document.getElementById('submission-status').innerText = "⚠️ Score submission attempted.";
             });
         }
     </script>
