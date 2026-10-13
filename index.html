@@ -14,27 +14,32 @@
             height: 100vh; 
             display: flex;
             flex-direction: column;
-            /* 🔥 防止手機瀏覽器被不小心下拉重新整理 */
             overscroll-behavior: none; 
             overflow: hidden; 
             user-select: none; 
             -webkit-user-select: none;
         }
 
+        /* 🔥 標頭凍結：確保手機捲動時，計時器與進度條永遠置頂可見 */
         header {
+            position: sticky;
+            top: 0;
             padding: 10px 20px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            background: #ffffff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            z-index: 500;
         }
 
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .stage-pill {
@@ -53,6 +58,7 @@
             font-size: 1.05rem;
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
             gap: 15px;
         }
 
@@ -241,8 +247,10 @@
 
         .part:hover { background: #f6e05e; color: #2d3748; box-shadow: 0 4px 0 #d69e2e, 0 6px 8px rgba(0,0,0,0.1); }
         .part:active { transform: scale(0.95) translateY(4px); box-shadow: 0 0 0 #d69e2e, 0 3px 4px rgba(0,0,0,0.1); }
+        
+        /* 🔥 確保拖曳中的積木圖層高於標頭，不會被標頭蓋住 */
         .part.dragging {
-            box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 1000 !important;
+            box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 2000 !important;
             background: #f6e05e !important; border: 3px solid #d69e2e !important; color: #2d3748 !important;
         }
 
@@ -262,7 +270,7 @@
 
         #modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 2000;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 3000;
         }
         #modal-box {
             background: white; padding: 30px; border-radius: 20px; text-align: center;
@@ -291,14 +299,20 @@
         }
         #play-again-btn:hover { background: #38a169; }
 
-        /* 🔥 手機直向模式 (原本的排版) */
+        /* 🔥 手機版 UI 微調，確保資訊列不會擠成一團 */
+        @media (max-width: 600px) {
+            .energy-labels { font-size: 0.8rem; }
+            .stage-pill { padding: 4px 10px; font-size: 0.9rem; }
+            .progress-text { font-size: 0.9rem; gap: 8px; }
+            .timer-display { padding: 2px 8px; }
+        }
+
         @media (max-width: 900px) and (orientation: portrait) {
-            #game-board { flex-direction: column; overflow-y: auto; height: auto; }
+            #game-board { flex-direction: column; overflow-y: auto; height: auto; padding-bottom: 30px; }
             body { height: auto; overflow: auto; }
             #left-panel, #center-panel { min-height: 250px; }
         }
 
-        /* 🔥 手機橫向模式 (解決打橫無法遊玩的問題) */
         @media (max-height: 500px) and (orientation: landscape) {
             header { flex-direction: row; padding: 5px 15px; }
             .header-top { flex: 1; gap: 10px; }
@@ -445,7 +459,6 @@
         </div>
     </div>
 
-    <!-- 提交彈窗 -->
     <div id="modal-overlay">
         <div id="modal-box">
             <h2 id="modal-title">🎉 Game Over!</h2>
@@ -568,15 +581,6 @@
             el.addEventListener('touchstart', dragStart, { passive: false });
         }
 
-        // 🔥 核心修正：升級座標追蹤方式，解決手機版往下捲動時拖曳物會亂飛的問題！
-        function moveAt(e) {
-            let pageX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
-            let pageY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
-            draggedItem.style.position = 'absolute';
-            draggedItem.style.left = (pageX - draggedItem.offsetWidth/2) + 'px';
-            draggedItem.style.top = (pageY - draggedItem.offsetHeight/2) + 'px';
-        }
-
         function dragStart(e) {
             e.preventDefault();
             draggedItem = e.target;
@@ -588,6 +592,14 @@
             window.addEventListener('touchmove', dragMove, { passive: false });
             window.addEventListener('mouseup', dragEnd);
             window.addEventListener('touchend', dragEnd);
+        }
+
+        function moveAt(e) {
+            let clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            let clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            draggedItem.style.position = 'absolute';
+            draggedItem.style.left = (clientX - draggedItem.offsetWidth/2) + 'px';
+            draggedItem.style.top = (clientY - draggedItem.offsetHeight/2) + 'px';
         }
 
         function dragMove(e) {
@@ -677,13 +689,19 @@
 
                     let isValid = false;
                     
+                    // 🔥 智慧象限判定：不只看距離，而是看嚴格的相對位置（左右、上下）
+                    let dx = node2_cx - node1_cx; // dx>0 代表 Node 2 在 Node 1 的右邊
+                    let dy = node2_cy - node1_cy; // dy>0 代表 Node 2 在 Node 1 的下面
+                    
                     if (r.p1 === r.p2) {
-                        isValid = true;
+                        isValid = true; // 兩個部件相同（例如：朋、多），無所謂順序
                     } else {
                         if (r.layout === "LR") {
-                            if (node1_cx <= node2_cx + 50) isValid = true; 
+                            // Node 2 必須在 Node 1 的「右側」，且水平距離大於垂直距離的一半 (允許些微上下歪斜)
+                            if (dx > 0 && Math.abs(dx) >= Math.abs(dy) * 0.5) isValid = true; 
                         } else if (r.layout === "TB") {
-                            if (node1_cy <= node2_cy + 50) isValid = true; 
+                            // Node 2 必須在 Node 1 的「下方」，且垂直距離大於水平距離的一半 (允許些微左右歪斜)
+                            if (dy > 0 && Math.abs(dy) >= Math.abs(dx) * 0.5) isValid = true; 
                         }
                     }
 
