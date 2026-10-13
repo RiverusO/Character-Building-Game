@@ -229,8 +229,19 @@
         #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
 
         #right-panel { flex: 1.5; display: flex; flex-direction: column; }
+        
+        /* 🔥 核心修正：為積木庫底部墊出安全的呼吸空間，確保最後一排絕對不會被截斷 */
         #parts-container {
-            flex-grow: 1; width: 100%; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; overflow-y: auto; padding-right: 5px; position: relative;
+            flex-grow: 1; 
+            width: 100%; 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-content: flex-start; 
+            gap: 10px; 
+            overflow-y: auto; 
+            padding-right: 5px; 
+            padding-bottom: 50px; /* 增加底部空白距離 */
+            position: relative;
         }
         #parts-container::-webkit-scrollbar { width: 6px; }
         #parts-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
@@ -264,6 +275,19 @@
             75% { transform: translateX(10px); }
         }
         .error-anim { animation: shake 0.4s; background: #fff5f5; border-color: #fc8181; color: #c53030; }
+
+        @keyframes vanishAnim {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: scale(0) rotate(15deg); opacity: 0; filter: blur(2px); }
+        }
+        .vanish-anim { animation: vanishAnim 0.3s forwards !important; pointer-events: none; }
+
+        @keyframes respawnAnim {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .respawn-anim { animation: respawnAnim 0.4s forwards !important; }
 
         #modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -310,8 +334,9 @@
             .timer-display { padding: 2px 8px; }
         }
 
+        /* 🔥 確保手機直向模式整個版面底部也有足夠空間 */
         @media (max-width: 900px) and (orientation: portrait) {
-            #game-board { flex-direction: column; overflow-y: auto; height: auto; padding-bottom: 30px; }
+            #game-board { flex-direction: column; overflow-y: auto; height: auto; padding-bottom: 80px; }
             body { height: auto; overflow: auto; }
             #left-panel, #center-panel { min-height: 250px; }
         }
@@ -462,10 +487,9 @@
         </div>
     </div>
 
-    <!-- 🔥 重新設計的結算彈窗 -->
     <div id="modal-overlay">
         <div id="modal-box">
-            <h2 id="modal-title">🎉 太厲害了！</h2>
+            <h2 id="modal-title">🎉 終極進化完成！</h2>
             
             <div class="score-board">
                 <p>🏆 答對題數：<span id="final-score" style="color: #e53e3e; font-size: 1.5rem;">0</span> / 31</p>
@@ -710,9 +734,9 @@
                         isValid = true;
                     } else {
                         if (r.layout === "LR") {
-                            if (node1_cx <= node2_cx + 50) isValid = true; 
+                            if (node1_cx < node2_cx + 40) isValid = true; 
                         } else if (r.layout === "TB") {
-                            if (node1_cy <= node2_cy + 50) isValid = true; 
+                            if (node1_cy < node2_cy + 40) isValid = true; 
                         }
                     }
 
@@ -767,7 +791,6 @@
 
                         updateProgress();
                         
-                        // 🔥 滿分延遲觸發：凍結計時器，給學生 3 秒鐘欣賞燃燒怪獸的成就感！
                         if(score === TOTAL_RECIPES) {
                             clearInterval(timerInterval);
                             setTimeout(() => {
@@ -788,26 +811,26 @@
                 cauldron.classList.add('error-anim');
                 document.getElementById('speech-bubble').innerText = "哎呀！拼錯了，再試一次。";
                 
-                pA.style.transition = 'all 0.3s ease';
-                pB.style.transition = 'all 0.3s ease';
-                pA.style.transform = 'scale(0)';
-                pA.style.opacity = '0';
-                pB.style.transform = 'scale(0)';
-                pB.style.opacity = '0';
+                pA.classList.add('vanish-anim');
+                pB.classList.add('vanish-anim');
                 
                 setTimeout(() => {
                     cauldron.classList.remove('error-anim');
-                    pA.style.transition = '';
-                    pB.style.transition = '';
-                    pA.style.transform = '';
-                    pA.style.opacity = '';
-                    pB.style.transform = '';
-                    pB.style.opacity = '';
+                    pA.classList.remove('vanish-anim');
+                    pB.classList.remove('vanish-anim');
 
                     resetPart(pA);
                     resetPart(pB);
                     cauldronParts = [];
-                }, 400);
+
+                    pA.classList.add('respawn-anim');
+                    pB.classList.add('respawn-anim');
+                    setTimeout(() => {
+                        pA.classList.remove('respawn-anim');
+                        pB.classList.remove('respawn-anim');
+                    }, 400);
+
+                }, 300);
             }
         }
 
@@ -837,10 +860,9 @@
         }
 
         function endGame(isWin) {
-            clearInterval(timerInterval); // 確保提早結束時也會停止計時
+            clearInterval(timerInterval); 
             document.getElementById('modal-overlay').style.display = 'flex';
             
-            // 🔥 將最終成績與時間更新到結算單上
             document.getElementById('final-score').innerText = score;
             document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
 
