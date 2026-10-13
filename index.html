@@ -228,18 +228,11 @@
             box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); transition: 0.2s;
         }
         .modal-btn:hover { background: linear-gradient(135deg, #8b5cf6, #7c3aed); transform: translateY(-2px); }
-        
-        #play-again-btn { 
-            background: #48bb78; color: white; border: none; padding: 12px 25px; 
-            font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; 
-            display: none; margin-top: 10px; box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3); 
-        }
-        #play-again-btn:hover { background: #38a169; }
     </style>
 </head>
 <body>
 
-    <!-- 🔥 開場名字輸入與規則提示頁面 -->
+    <!-- 🔥 開場說明與名字輸入頁面 -->
     <div id="intro-overlay">
         <div id="intro-box">
             <h2>🚀 Welcome, Scholar!</h2>
@@ -247,8 +240,8 @@
             <input type="text" id="intro-student-name" placeholder="e.g., Alex">
             
             <div style="background: #fff5f5; border: 2px dashed #fc8181; border-radius: 12px; padding: 12px; margin: 15px 0; text-align: left; color: #c53030; font-size: 0.9rem; line-height: 1.4;">
-                <p style="margin: 0 0 6px 0; font-weight: bold;">⚠️ Game Rule:</p>
-                <p style="margin: 0;">Each character can <b>only be formed once</b>! Once a character is successfully created, you cannot repeat it. Mistakes will return your parts.</p>
+                <p style="margin: 0 0 6px 0; font-weight: bold;">⚠️ Game Instructions & Rules:</p>
+                <p style="margin: 0;">Drag and drop parts into the Magic Drop Zone to form characters. <b>Once a character is successfully formed, you cannot repeat it!</b> Completed characters cannot be formed again.</p>
             </div>
             <button class="modal-btn" onclick="startGame()">Start Game ✨</button>
         </div>
@@ -374,6 +367,7 @@
                 <p>⏱️ Time Taken: <span id="final-time" style="color: #3182ce;">00:00</span></p>
             </div>
             <p id="submission-status" style="font-weight: bold; color: #48bb78; margin-bottom: 15px; font-size: 0.95rem;">✅ Score automatically sent to the teacher!</p>
+            <p id="encouragement-text" style="color: #4a5568; font-weight: bold; margin-bottom: 15px; font-size: 0.95rem;"></p>
             <button class="modal-btn" id="play-again-btn" onclick="location.reload()" style="display: block;">Play Again ✨</button>
         </div>
     </div>
@@ -462,6 +456,13 @@
             "Extraordinary! I've earned my wings thanks to your brilliance!", 
             "Look at that, I have arms and legs now! Keep feeding me your wisdom!", 
             "ROAAAAR! I am blazing with ultimate power! Absolute perfection achieved!" 
+        ];
+
+        const finalCheers = [
+            "Fantastic effort! Your mastery of Chinese characters is growing stronger every day!",
+            "Incredible dedication! You showed exceptional focus and brilliance throughout this journey.",
+            "Outstanding achievement! Be very proud of your hard work and sharp mind!",
+            "Magnificent performance! You're becoming a true expert in Chinese radicals!"
         ];
 
         const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
@@ -792,12 +793,16 @@
         function endGame(isWin) {
             if(timerInterval) clearInterval(timerInterval); 
             
-            // 🔥 自動在背景提交成績到 Google 試算表
+            // 🔥 自動提交成績到 Google 試算表
             autoSubmitScore();
 
             document.getElementById('modal-overlay').style.display = 'flex';
             document.getElementById('final-score').innerText = score;
             document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
+
+            // 隨機抽選一句精美英文鼓勵
+            let randomEncouragement = finalCheers[Math.floor(Math.random() * finalCheers.length)];
+            document.getElementById('encouragement-text').innerText = randomEncouragement;
 
             if(isWin) {
                 document.getElementById('modal-title').innerText = "🎉 Ultimate Evolution Complete!";
