@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Monster Evolution: Chinese Radicals</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fe; 
+            color: #2d3748;
+            margin: 0;
+            padding: 0;
+            height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            /* 🔥 防止手機瀏覽器被不小心下拉重新整理 */
+            overscroll-behavior: none; 
+            overflow: hidden; 
+            user-select: none; 
+            -webkit-user-select: none;
+        }
+
+        header {
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            z-index: 10;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stage-pill {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+        }
+
+        .progress-text {
+            font-weight: bold;
+            color: #4a5568;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .timer-display {
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 10px;
+            color: #2b6cb0;
+            border: 2px solid #e2e8f0;
+        }
+
+        #end-game-btn {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
+            transition: all 0.2s;
+        }
+        #end-game-btn:hover { background: #c53030; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(229, 62, 62, 0.4); }
+
+        .energy-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .energy-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #718096;
+        }
+        .energy-bar-bg {
+            background-color: #e2e8f0;
+            height: 14px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .energy-bar-fill {
+            background: linear-gradient(90deg, #ff7e5f, #feb47b);
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease-out;
+        }
+
+        #game-board {
+            flex-grow: 1;
+            display: flex;
+            padding: 15px 20px;
+            gap: 15px;
+            box-sizing: border-box;
+            height: calc(100vh - 90px);
+        }
+
+        .panel {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.04);
+            box-sizing: border-box;
+        }
+
+        #left-panel { 
+            flex: 1; 
+            justify-content: center; 
+            position: relative; 
+            background: transparent;
+            box-shadow: none;
+        }
+        
+        .speech-bubble {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #4a5568;
+            position: relative;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            text-align: center;
+            animation: float 3s ease-in-out infinite;
+            max-width: 90%;
+            z-index: 20;
+        }
+        .speech-bubble::after {
+            content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            border-width: 10px 10px 0; border-style: solid; border-color: white transparent transparent transparent;
+        }
+        .speech-bubble::before {
+            content: ''; position: absolute; bottom: -13px; left: 50%; transform: translateX(-50%);
+            border-width: 12px 12px 0; border-style: solid; border-color: #e2e8f0 transparent transparent transparent; z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        #monster-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        #monster-svg {
+            width: 280px;
+            height: 280px;
+            overflow: visible;
+        }
+        
+        #monster-container .monster-part { opacity: 0; transition: opacity 0.8s ease; transform-origin: center; }
+        
+        #monster-container.monster-stage-1 .stage-1-part { opacity: 1; }
+        #monster-container.monster-stage-2 .stage-1-part, #monster-container.monster-stage-2 .stage-2-part { opacity: 1; }
+        #monster-container.monster-stage-3 .stage-1-part, #monster-container.monster-stage-3 .stage-2-part, #monster-container.monster-stage-3 .stage-3-part { opacity: 1; }
+        #monster-container.monster-stage-4 .stage-1-part, #monster-container.monster-stage-4 .stage-2-part, #monster-container.monster-stage-4 .stage-3-part, #monster-container.monster-stage-4 .stage-4-part { opacity: 1; }
+
+        #cute-face { display: block; }
+        #angry-face { display: none; }
+        #monster-container.monster-stage-4 #cute-face { display: none; }
+        #monster-container.monster-stage-4 #angry-face { display: block; }
+
+        #cute-mouth-open { display: none; }
+        #monster-container.is-eating #cute-mouth-closed { display: none !important; }
+        #monster-container.is-eating #cute-mouth-open { display: block !important; }
+
+        @keyframes ragingFire {
+            0% { transform: scale(0.95) translateY(5px); filter: drop-shadow(0 0 10px #E53E3E); }
+            100% { transform: scale(1.05) translateY(-5px); filter: brightness(1.3) drop-shadow(0 0 30px #F6E05E); }
+        }
+        .fire-aura { transform-origin: center; animation: ragingFire 0.4s infinite alternate; }
+
+        @keyframes starTwinkle {
+            0%, 100% { transform: scale(1) rotate(0deg); fill: #f6e05e; }
+            50% { transform: scale(1.2) rotate(20deg); fill: #fff382; }
+        }
+        .star-anim { transform-origin: center; animation: starTwinkle 1.5s infinite; }
+
+        @keyframes happyJump {
+            0%, 100% { transform: translateY(0) scale(1); }
+            30% { transform: translateY(-25px) scale(1.05); }
+            50% { transform: translateY(0) scale(0.95); }
+            70% { transform: translateY(-12px) scale(1.02); }
+        }
+        .eating-anim { animation: happyJump 0.5s ease-out; }
+
+        #center-panel { 
+            flex: 1.2; justify-content: flex-start; border: 3px dashed #cbd5e0; background: #f8fafc;
+        }
+        .panel-title { font-size: 1.15rem; font-weight: bold; margin-bottom: 5px; color: #2d3748; text-align: center; }
+        .panel-subtitle { font-size: 0.85rem; color: #a0aec0; margin-bottom: 12px; text-align: center; }
+        #cauldron {
+            flex-grow: 1; width: 100%; border-radius: 15px; position: relative; display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
+
+        #right-panel { flex: 1.5; display: flex; flex-direction: column; }
+        #parts-container {
+            flex-grow: 1; width: 100%; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; overflow-y: auto; padding-right: 5px; position: relative;
+        }
+        #parts-container::-webkit-scrollbar { width: 6px; }
+        #parts-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
+
+        .part {
+            font-family: "DFKai-SB", "BiauKai", "KaiTi", "STKaiti", "楷體", serif;
+            background: #48bb78; color: #ffffff; font-size: 1.8rem; font-weight: normal;
+            width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;
+            border-radius: 12px; box-shadow: 0 4px 0 #38a169, 0 6px 8px rgba(0,0,0,0.1); 
+            touch-action: none; z-index: 10; transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+            cursor: url('data:image/svg+xml;utf8,%3Csvg%20width%3D%2228%22%20height%3D%2228%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23f6e05e%22%20stroke%3D%22%232d3748%22%20stroke-width%3D%221%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M10.5%202C10.5%201.2%2011.2%200.5%2012%200.5C12.8%200.5%2013.5%201.2%2013.5%202V8H14.5C14.5%207.2%2015.2%206.5%2016%206.5C16.8%206.5%2017.5%207.2%2017.5%208V9H18.5C18.5%208.2%2019.2%207.5%2020%207.5C20.8%207.5%2021.5%208.2%2021.5%209V14C21.5%2018.5%2017.5%2022%2013%2022C8.5%2022%205.5%2018%205.5%2013V11C5.5%2010.2%206.2%209.5%207%209.5C7.8%209.5%208.5%2010.2%208.5%2011V12H9.5V4C9.5%203.2%2010.2%202.5%2011%202.5C11%202.5%2010.5%202%2010.5%202Z%22%2F%3E%3C%2Fsvg%3E') 14 14, grab;
+        }
+
+        .part:hover { background: #f6e05e; color: #2d3748; box-shadow: 0 4px 0 #d69e2e, 0 6px 8px rgba(0,0,0,0.1); }
+        .part:active { transform: scale(0.95) translateY(4px); box-shadow: 0 0 0 #d69e2e, 0 3px 4px rgba(0,0,0,0.1); }
+        .part.dragging {
+            box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 1000 !important;
+            background: #f6e05e !important; border: 3px solid #d69e2e !important; color: #2d3748 !important;
+        }
+
+        @keyframes combinePulse {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.5); filter: brightness(1.2); color: #f6e05e; border-color: #f6e05e; }
+            100% { transform: scale(1.2); filter: brightness(1); }
+        }
+        .success-anim { animation: combinePulse 0.5s forwards; z-index: 500; border: 3px solid #f6e05e !important; background: #48bb78 !important; color: white !important;}
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .error-anim { animation: shake 0.4s; background: #fff5f5; border-color: #fc8181; color: #c53030; }
+
+        #modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 2000;
+        }
+        #modal-box {
+            background: white; padding: 30px; border-radius: 20px; text-align: center;
+            width: 85%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        #modal-box h2 { color: #2d3748; margin-top: 0; }
+        #modal-box input {
+            font-size: 1.1rem; padding: 12px; margin: 15px 0; width: 85%;
+            border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s;
+        }
+        #modal-box input:focus { border-color: #8b5cf6; }
+        
+        #modal-submit-btn {
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; 
+            border: none; padding: 12px 30px; font-size: 1.1rem; 
+            border-radius: 10px; cursor: pointer; font-weight: bold;
+            width: 100%; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+        }
+        
+        #play-again-btn {
+            background: #48bb78; color: white; 
+            border: none; padding: 12px 30px; font-size: 1.1rem; 
+            border-radius: 10px; cursor: pointer; font-weight: bold;
+            width: 100%; box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+            display: none; margin-top: 10px;
+        }
+        #play-again-btn:hover { background: #38a169; }
+
+        /* 🔥 手機直向模式 (原本的排版) */
+        @media (max-width: 900px) and (orientation: portrait) {
+            #game-board { flex-direction: column; overflow-y: auto; height: auto; }
+            body { height: auto; overflow: auto; }
+            #left-panel, #center-panel { min-height: 250px; }
+        }
+
+        /* 🔥 手機橫向模式 (解決打橫無法遊玩的問題) */
+        @media (max-height: 500px) and (orientation: landscape) {
+            header { flex-direction: row; padding: 5px 15px; }
+            .header-top { flex: 1; gap: 10px; }
+            .energy-container { flex: 1; margin-left: 20px; }
+            
+            #game-board { flex-direction: row; height: calc(100vh - 65px); padding: 5px 10px; gap: 10px; }
+            body { height: 100vh; overflow: hidden; }
+            
+            #left-panel, #center-panel { min-height: unset; flex: 1; }
+            #right-panel { flex: 1.5; }
+            
+            #monster-svg { width: 130px; height: 130px; }
+            .speech-bubble { font-size: 0.8rem; padding: 4px 10px; margin-bottom: 5px; }
+            
+            .part { width: 40px; height: 40px; font-size: 1.3rem; }
+            .panel { padding: 8px; }
+            .panel-title { font-size: 0.95rem; margin-bottom: 2px; }
+            .panel-subtitle { font-size: 0.7rem; margin-bottom: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="stage-pill" id="stage-indicator">Stage 0: Cute Egg</div>
+            <div class="progress-text">
+                <span>Progress: <span id="score-count">0</span> / <span id="total-count">31</span></span>
+                <span class="timer-display">⏱️ <span id="timer">00:00</span></span>
+            </div>
+            <button id="end-game-btn" onclick="endGame(false)">🛑 End Game</button>
+        </div>
+        <div class="energy-container">
+            <div class="energy-labels">
+                <span>🔋 Monster Evolution Energy</span>
+                <span id="energy-percent">0%</span>
+            </div>
+            <div class="energy-bar-bg">
+                <div class="energy-bar-fill" id="energy-bar"></div>
+            </div>
+        </div>
+    </header>
+
+    <div id="game-board">
+        <div id="left-panel" class="panel">
+            <div class="speech-bubble" id="speech-bubble">Feed me characters!</div>
+            
+            <div id="monster-container" class="monster-stage-0">
+                <svg id="monster-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="bodyGrad" cx="30%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#48bb78" />
+                            <stop offset="100%" stop-color="#276749" />
+                        </radialGradient>
+                        <radialGradient id="wingGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#9F7AEA" />
+                            <stop offset="100%" stop-color="#553C9A" />
+                        </radialGradient>
+                    </defs>
+
+                    <g class="monster-part stage-4-part fire-aura">
+                        <path d="M 150 10 C 250 60 300 150 260 250 C 220 300 80 300 40 250 C 0 150 50 60 150 10 Z" fill="#E53E3E" opacity="0.9"/>
+                        <path d="M 150 40 C 220 80 260 150 230 230 C 200 280 100 280 70 230 C 40 150 80 80 150 40 Z" fill="#DD6B20"/>
+                        <path d="M 150 70 C 190 100 220 150 200 210 C 180 250 120 250 100 210 C 80 150 110 100 150 70 Z" fill="#F6E05E"/>
+                    </g>
+
+                    <g class="monster-part stage-2-part">
+                        <path d="M 110 140 Q 30 50 10 90 Q 50 150 80 180 Z" fill="url(#wingGrad)" stroke="#4C1D95" stroke-width="3"/>
+                        <path d="M 10 90 Q 20 120 60 150" stroke="#4C1D95" stroke-width="3" fill="none"/>
+                        <path d="M 190 140 Q 270 50 290 90 Q 250 150 220 180 Z" fill="url(#wingGrad)" stroke="#4C1D95" stroke-width="3"/>
+                        <path d="M 290 90 Q 280 120 240 150" stroke="#4C1D95" stroke-width="3" fill="none"/>
+                    </g>
+
+                    <g class="monster-part stage-3-part">
+                        <rect x="110" y="200" width="25" height="35" rx="10" fill="url(#bodyGrad)" />
+                        <rect x="165" y="200" width="25" height="35" rx="10" fill="url(#bodyGrad)" />
+                        <rect x="60" y="150" width="40" height="18" rx="9" fill="url(#bodyGrad)" transform="rotate(30 80 159)" />
+                        <rect x="200" y="150" width="40" height="18" rx="9" fill="url(#bodyGrad)" transform="rotate(-30 220 159)" />
+                        <line x1="235" y1="165" x2="265" y2="100" stroke="#718096" stroke-width="4" stroke-linecap="round" />
+                        <polygon points="265,85 270,98 284,98 273,107 277,120 265,112 253,120 257,107 246,98 260,98" fill="#F6E05E" class="star-anim" />
+                    </g>
+
+                    <circle cx="150" cy="150" r="70" fill="url(#bodyGrad)" />
+                    <ellipse cx="150" cy="180" rx="40" ry="30" fill="#FDE047" /> 
+
+                    <g class="monster-part stage-1-part">
+                        <path d="M 115 100 Q 90 50 100 40 Q 125 70 130 90 Z" fill="#F6E05E" stroke="#B7791F" stroke-width="2"/>
+                        <path d="M 185 100 Q 210 50 200 40 Q 175 70 170 90 Z" fill="#F6E05E" stroke="#B7791F" stroke-width="2"/>
+                    </g>
+
+                    <g id="cute-face">
+                        <circle cx="150" cy="105" r="16" fill="white" />
+                        <circle cx="150" cy="105" r="8" fill="#3E2723" />
+                        <circle cx="147" cy="102" r="3" fill="white" />
+                        
+                        <circle cx="115" cy="130" r="18" fill="white" />
+                        <circle cx="120" cy="130" r="9" fill="#3E2723" />
+                        <circle cx="117" cy="127" r="3" fill="white" />
+                        
+                        <circle cx="185" cy="130" r="18" fill="white" />
+                        <circle cx="180" cy="130" r="9" fill="#3E2723" />
+                        <circle cx="177" cy="127" r="3" fill="white" />
+                        
+                        <path id="cute-mouth-closed" d="M 140 155 Q 150 165 160 155" stroke="#3E2723" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <path id="cute-mouth-open" d="M 135 155 Q 150 180 165 155 Z" fill="#3E2723"/>
+                        
+                        <ellipse cx="95" cy="145" rx="8" ry="4" fill="#FC8181" opacity="0.6"/>
+                        <ellipse cx="205" cy="145" rx="8" ry="4" fill="#FC8181" opacity="0.6"/>
+                    </g>
+
+                    <g id="angry-face" class="monster-part stage-4-part">
+                        <circle cx="150" cy="105" r="16" fill="white" />
+                        <circle cx="150" cy="105" r="7" fill="#c53030" />
+                        <path d="M 135 95 L 165 95 L 150 80 Z" fill="url(#bodyGrad)" /> 
+                        
+                        <circle cx="115" cy="130" r="18" fill="white" />
+                        <circle cx="120" cy="130" r="8" fill="#c53030" />
+                        <path d="M 95 115 L 135 125 L 115 100 Z" fill="url(#bodyGrad)" />
+                        
+                        <circle cx="185" cy="130" r="18" fill="white" />
+                        <circle cx="180" cy="130" r="8" fill="#c53030" />
+                        <path d="M 205 115 L 165 125 L 185 100 Z" fill="url(#bodyGrad)" />
+                        
+                        <path d="M 130 155 Q 150 195 170 155 Z" fill="#742A2A"/>
+                        <path d="M 135 155 L 140 165 L 145 155 L 150 165 L 155 155 L 160 165 L 165 155 Z" fill="white"/> 
+                    </g>
+                    
+                    <g class="monster-part stage-4-part fire-aura" style="animation-delay: 0.2s;">
+                        <path d="M 70 280 Q 100 200 120 260 Q 150 180 180 260 Q 200 200 230 280 Q 150 320 70 280 Z" fill="#FBD38D" opacity="0.9"/>
+                    </g>
+                </svg>
+            </div>
+        </div>
+
+        <div id="center-panel" class="panel">
+            <div class="panel-title">✨ Magic Drop Zone</div>
+            <div class="panel-subtitle">Drag 2 parts here (Left/Right or Top/Bottom)</div>
+            <div id="cauldron"></div>
+        </div>
+
+        <div id="right-panel" class="panel">
+            <div class="panel-title" style="margin-bottom: 10px;">🧩 Parts Inventory</div>
+            <div id="parts-container"></div>
+        </div>
+    </div>
+
+    <!-- 提交彈窗 -->
+    <div id="modal-overlay">
+        <div id="modal-box">
+            <h2 id="modal-title">🎉 Game Over!</h2>
+            <p style="color: #718096; margin-bottom: 5px;">Please enter your name:</p>
+            <input type="text" id="student-name" placeholder="e.g., Jin">
+            <br>
+            <button id="modal-submit-btn" onclick="submitScore()">Send to Teacher</button>
+            <button id="play-again-btn" onclick="location.reload()">Play Again</button>
+            <p id="submit-msg" style="font-weight:bold; margin-top:15px;"></p>
+        </div>
+    </div>
+
+    <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyffejRgG6qazRRYFn3-9Wpc-MLvcL7AGxdLfot266LGxZF5aHzPuaGTeO3zxlf6EM/exec";
+
+        const recipes = [
+            { result: "拍", p1: "扌", p2: "白", layout: "LR", completed: false },
+            { result: "左", p1: "𠂇", p2: "工", layout: "TB", completed: false },
+            { result: "右", p1: "𠂇", p2: "口", layout: "TB", completed: false },
+            { result: "你", p1: "亻", p2: "尔", layout: "LR", completed: false },
+            { result: "他", p1: "亻", p2: "也", layout: "LR", completed: false },
+            { result: "這", p1: "辶", p2: "言", layout: "LR", completed: false },
+            { result: "誰", p1: "言", p2: "隹", layout: "LR", completed: false },
+            { result: "的", p1: "白", p2: "勺", layout: "LR", completed: false },
+            { result: "秋", p1: "禾", p2: "火", layout: "LR", completed: false },
+            { result: "陪", p1: "阝", p2: "咅", layout: "LR", completed: false },
+            { result: "部", p1: "咅", p2: "阝", layout: "LR", completed: false },
+            { result: "海", p1: "氵", p2: "每", layout: "LR", completed: false },
+            { result: "好", p1: "女", p2: "子", layout: "LR", completed: false },
+            { result: "朋", p1: "月", p2: "月", layout: "LR", completed: false },
+            { result: "友", p1: "𠂇", p2: "又", layout: "TB", completed: false },
+            { result: "們", p1: "亻", p2: "門", layout: "LR", completed: false },
+            { result: "起", p1: "走", p2: "巳", layout: "LR", completed: false },
+            { result: "天", p1: "一", p2: "大", layout: "TB", completed: false },
+            { result: "明", p1: "日", p2: "月", layout: "LR", completed: false },
+            { result: "和", p1: "禾", p2: "口", layout: "LR", completed: false },
+            { result: "分", p1: "八", p2: "刀", layout: "TB", completed: false },
+            { result: "啊", p1: "口", p2: "阿", layout: "LR", completed: false },
+            { result: "多", p1: "夕", p2: "夕", layout: "TB", completed: false },
+            { result: "玩", p1: "王", p2: "元", layout: "LR", completed: false },
+            { result: "到", p1: "至", p2: "刂", layout: "LR", completed: false },
+            { result: "課", p1: "言", p2: "果", layout: "LR", completed: false },
+            { result: "拉", p1: "扌", p2: "立", layout: "LR", completed: false },
+            { result: "看", p1: "龵", p2: "目", layout: "TB", completed: false },
+            { result: "找", p1: "扌", p2: "戈", layout: "LR", completed: false },
+            { result: "隻", p1: "隹", p2: "又", layout: "TB", completed: false },
+            { result: "青", p1: "龶", p2: "月", layout: "TB", completed: false }
+        ];
+        
+        const rawParts = [
+            "扌", "白", "𠂇", "工", "𠂇", "口", "亻", "尔", "亻", "也", 
+            "辶", "言", "言", "隹", "白", "勺", "禾", "火", "阝", "咅", 
+            "咅", "阝", "氵", "每", "女", "子", "月", "月", "𠂇", "又", 
+            "亻", "門", "走", "巳", "一", "大", "日", "月", "禾", "口",
+            "八", "刀", "口", "阿", "夕", "夕", "王", "元", "至", "刂", 
+            "言", "果", "扌", "立", "龵", "目", "扌", "戈", "隹", "又", 
+            "龶", "月"
+        ];
+        
+        const TOTAL_RECIPES = 31; 
+        document.getElementById('total-count').innerText = TOTAL_RECIPES;
+
+        const stages = [
+            { score: 0, class: "monster-stage-0", name: "Stage 0: Cute Blob" },
+            { score: 8, class: "monster-stage-1", name: "Stage 1: Growing Horns" },
+            { score: 16, class: "monster-stage-2", name: "Stage 2: Winged Monster" },
+            { score: 24, class: "monster-stage-3", name: "Stage 3: Magic Wand" },
+            { score: 31, class: "monster-stage-4", name: "Stage 4: ON FIRE!!!" } 
+        ];
+
+        const standardCheers = [
+            "Great job! Keep it up!", "You're doing amazing!", "Spot on! You are a genius!",
+            "Fantastic work! Feed me more!", "That's exactly right!", "Brilliant move!",
+            "You're a natural at this!", "Wow, you figured it out perfectly!"
+        ];
+        
+        const stageUpCheers = [
+            "Wow! Look at me, I'm growing horns!", 
+            "Amazing! I got my wings! You're the best!", 
+            "I have hands now! Keep feeding me!", 
+            "ROAAAAR!!! I am ON FIRE!!! Perfect score!" 
+        ];
+
+        const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
+
+        let score = 0;
+        let currentStageIndex = 0;
+        let mistakes = 0;
+        let wrongRecords = []; 
+        let cauldronParts = []; 
+        
+        let startTime = Date.now();
+        let timerInterval = setInterval(() => {
+            let diff = Math.floor((Date.now() - startTime) / 1000);
+            let m = String(Math.floor(diff / 60)).padStart(2, '0');
+            let s = String(diff % 60).padStart(2, '0');
+            document.getElementById('timer').innerText = m + ':' + s;
+        }, 1000);
+
+        const partsContainer = document.getElementById('parts-container');
+        function initParts() {
+            partsContainer.innerHTML = '';
+            let shuffled = rawParts.sort(() => Math.random() - 0.5);
+            shuffled.forEach((char, index) => {
+                let div = document.createElement('div');
+                div.className = 'part';
+                div.innerText = char;
+                div.dataset.char = char;
+                partsContainer.appendChild(div);
+                bindDragEvents(div);
+            });
+        }
+        initParts();
+
+        let draggedItem = null;
+        const cauldron = document.getElementById('cauldron');
+
+        function bindDragEvents(el) {
+            el.addEventListener('mousedown', dragStart);
+            el.addEventListener('touchstart', dragStart, { passive: false });
+        }
+
+        // 🔥 核心修正：升級座標追蹤方式，解決手機版往下捲動時拖曳物會亂飛的問題！
+        function moveAt(e) {
+            let pageX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
+            let pageY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
+            draggedItem.style.position = 'absolute';
+            draggedItem.style.left = (pageX - draggedItem.offsetWidth/2) + 'px';
+            draggedItem.style.top = (pageY - draggedItem.offsetHeight/2) + 'px';
+        }
+
+        function dragStart(e) {
+            e.preventDefault();
+            draggedItem = e.target;
+            draggedItem.classList.add('dragging');
+            document.body.appendChild(draggedItem); 
+            moveAt(e);
+
+            window.addEventListener('mousemove', dragMove);
+            window.addEventListener('touchmove', dragMove, { passive: false });
+            window.addEventListener('mouseup', dragEnd);
+            window.addEventListener('touchend', dragEnd);
+        }
+
+        function dragMove(e) {
+            if (!draggedItem) return;
+            e.preventDefault();
+            moveAt(e);
+
+            let clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+            let clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            let cauldronRect = cauldron.getBoundingClientRect();
+            
+            if (clientX > cauldronRect.left && clientX < cauldronRect.right &&
+                clientY > cauldronRect.top && clientY < cauldronRect.bottom) {
+                cauldron.classList.add('highlight');
+            } else {
+                cauldron.classList.remove('highlight');
+            }
+        }
+
+        function dragEnd(e) {
+            if (!draggedItem) return;
+            let clientX = e.type.includes('mouse') ? e.clientX : e.changedTouches[0].clientX;
+            let clientY = e.type.includes('mouse') ? e.clientY : e.changedTouches[0].clientY;
+
+            let cauldronRect = cauldron.getBoundingClientRect();
+            draggedItem.classList.remove('dragging');
+            cauldron.classList.remove('highlight');
+
+            if (clientX > cauldronRect.left && clientX < cauldronRect.right &&
+                clientY > cauldronRect.top && clientY < cauldronRect.bottom) {
+                
+                if (draggedItem.parentElement !== cauldron) {
+                    cauldron.appendChild(draggedItem);
+                    cauldronParts.push(draggedItem);
+                }
+                
+                draggedItem.style.left = (clientX - cauldronRect.left - draggedItem.offsetWidth/2) + 'px';
+                draggedItem.style.top = (clientY - cauldronRect.top - draggedItem.offsetHeight/2) + 'px';
+                
+                if (cauldronParts.length === 2) {
+                    setTimeout(checkRecipe, 150); 
+                }
+            } else {
+                resetPart(draggedItem);
+            }
+
+            window.removeEventListener('mousemove', dragMove);
+            window.removeEventListener('touchmove', dragMove);
+            window.removeEventListener('mouseup', dragEnd);
+            window.removeEventListener('touchend', dragEnd);
+            draggedItem = null;
+        }
+
+        function resetPart(part) {
+            partsContainer.appendChild(part);
+            part.style.position = '';
+            part.style.left = '';
+            part.style.top = '';
+            let idx = cauldronParts.indexOf(part);
+            if (idx > -1) cauldronParts.splice(idx, 1);
+        }
+
+        function checkRecipe() {
+            if (cauldronParts.length < 2) return;
+            let pA = cauldronParts[0];
+            let pB = cauldronParts[1];
+            
+            let charA = pA.dataset.char;
+            let charB = pB.dataset.char;
+
+            let rectA = pA.getBoundingClientRect();
+            let rectB = pB.getBoundingClientRect();
+            let cxA = rectA.left + rectA.width/2;
+            let cyA = rectA.top + rectA.height/2;
+            let cxB = rectB.left + rectB.width/2;
+            let cyB = rectB.top + rectB.height/2;
+
+            let matchedRecipe = null;
+
+            for (let r of recipes) {
+                if (!r.completed && ((r.p1 === charA && r.p2 === charB) || (r.p1 === charB && r.p2 === charA))) {
+                    let A_is_p1 = (charA === r.p1);
+                    let node1_cx = A_is_p1 ? cxA : cxB;
+                    let node1_cy = A_is_p1 ? cyA : cyB;
+                    let node2_cx = A_is_p1 ? cxB : cxA;
+                    let node2_cy = A_is_p1 ? cyB : cyA;
+
+                    let isValid = false;
+                    
+                    if (r.p1 === r.p2) {
+                        isValid = true;
+                    } else {
+                        if (r.layout === "LR") {
+                            if (node1_cx <= node2_cx + 50) isValid = true; 
+                        } else if (r.layout === "TB") {
+                            if (node1_cy <= node2_cy + 50) isValid = true; 
+                        }
+                    }
+
+                    if (isValid) {
+                        matchedRecipe = r;
+                        break;
+                    }
+                }
+            }
+
+            if (matchedRecipe) {
+                matchedRecipe.completed = true;
+
+                pA.innerText = matchedRecipe.result;
+                pA.classList.add('success-anim');
+                pB.style.display = 'none';
+
+                setTimeout(() => {
+                    pA.innerText = foods[Math.floor(Math.random() * foods.length)];
+                    pA.style.background = "transparent";
+                    pA.style.border = "none";
+                    pA.style.boxShadow = "none";
+                    pA.style.fontSize = "3.5rem";
+                    pA.style.cursor = "default";
+
+                    let monsterContainer = document.getElementById('monster-container');
+                    let monsterRect = monsterContainer.getBoundingClientRect();
+                    let pARect = pA.getBoundingClientRect();
+                    
+                    let moveX = (monsterRect.left + monsterRect.width/2) - (pARect.left + pARect.width/2);
+                    let moveY = (monsterRect.top + monsterRect.height/2) - (pARect.top + pARect.height/2);
+
+                    pA.style.transition = 'all 0.5s cubic-bezier(0.5, 0, 0.2, 1)';
+                    pA.style.transform = `translate(${moveX}px, ${moveY}px) scale(0.5)`;
+                    pA.style.opacity = '0';
+
+                    setTimeout(() => { monsterContainer.classList.add('is-eating'); }, 300);
+
+                    setTimeout(() => {
+                        pA.remove();
+                        pB.remove();
+                        cauldronParts = [];
+                        
+                        score++;
+                        document.getElementById('score-count').innerText = score;
+                        
+                        monsterContainer.classList.add('eating-anim');
+                        setTimeout(() => {
+                            monsterContainer.classList.remove('eating-anim');
+                            monsterContainer.classList.remove('is-eating'); 
+                        }, 500);
+
+                        updateProgress();
+                        if(score === TOTAL_RECIPES) endGame(true);
+                    }, 600);
+                }, 800);
+
+            } else {
+                mistakes++;
+                let dx = cxB - cxA;
+                let dy = cyB - cyA;
+                let errorLabel = Math.abs(dx) > Math.abs(dy) ? "L/R" : "T/B";
+                
+                wrongRecords.push(`${charA}+${charB}(${errorLabel})`); 
+
+                cauldron.classList.add('error-anim');
+                document.getElementById('speech-bubble').innerText = "Oops! Try again.";
+                
+                setTimeout(() => {
+                    cauldron.classList.remove('error-anim');
+                    resetPart(pA);
+                    resetPart(pB);
+                    cauldronParts = [];
+                }, 400);
+            }
+        }
+
+        function updateProgress() {
+            let percent = Math.floor((score / TOTAL_RECIPES) * 100);
+            document.getElementById('energy-percent').innerText = percent + "%";
+            document.getElementById('energy-bar').style.width = percent + "%";
+
+            let newStageIndex = 0;
+            for (let i = stages.length - 1; i >= 0; i--) {
+                if (score >= stages[i].score) {
+                    newStageIndex = i;
+                    break;
+                }
+            }
+
+            if (newStageIndex > currentStageIndex) {
+                document.getElementById('speech-bubble').innerText = stageUpCheers[newStageIndex - 1];
+                currentStageIndex = newStageIndex;
+                
+                let monsterContainer = document.getElementById('monster-container');
+                monsterContainer.className = stages[currentStageIndex].class;
+                
+            } else if (score < TOTAL_RECIPES) {
+                document.getElementById('speech-bubble').innerText = standardCheers[Math.floor(Math.random() * standardCheers.length)];
+            }
+
+            document.getElementById('stage-indicator').innerText = stages[currentStageIndex].name;
+        }
+
+        function endGame(isWin) {
+            clearInterval(timerInterval);
+            document.getElementById('modal-overlay').style.display = 'flex';
+            if(isWin) {
+                document.getElementById('modal-title').innerText = "🎉 All Stages Completed!";
+            } else {
+                document.getElementById('modal-title').innerText = `🏁 Game Ended! Score: ${score}`;
+            }
+        }
+
+        function submitScore() {
+            let name = document.getElementById('student-name').value;
+            if(!name) { alert("Please enter your name!"); return; }
+            
+            let btn = document.getElementById('modal-submit-btn');
+            btn.innerText = "Submitting...";
+            btn.disabled = true;
+
+            const formData = new URLSearchParams();
+            formData.append('score', score); 
+            formData.append('name', name);
+            formData.append('studentName', name);
+            formData.append('學生姓名', name);
+            
+            let wrongDetail = wrongRecords.length > 0 ? `${mistakes} mistakes (${wrongRecords.join(', ')})` : "Perfect";
+            formData.append('wrongAnswers', wrongDetail); 
+            formData.append('mistakes', wrongDetail);
+            formData.append('錯題紀錄', wrongDetail);
+            
+            let timeString = document.getElementById('timer').innerText;
+            formData.append('timeTaken', timeString); 
+            formData.append('作答時間', timeString); 
+            
+            formData.append('gameName', 'Monster Evolution Final');
+
+            fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                body: formData
+            }).then(() => {
+                document.getElementById('submit-msg').innerText = "✅ Submitted successfully!";
+                document.getElementById('submit-msg').style.color = "#48bb78";
+                btn.style.display = "none";
+                document.getElementById('play-again-btn').style.display = "inline-block";
+            }).catch(err => {
+                console.error(err);
+                document.getElementById('submit-msg').innerText = "❌ Failed. Check connection.";
+                document.getElementById('submit-msg').style.color = "#fc8181";
+                btn.innerText = "Try Again";
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
