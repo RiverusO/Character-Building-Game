@@ -453,7 +453,7 @@
             <input type="text" id="student-name" placeholder="e.g., Jin">
             <br>
             <button id="modal-submit-btn" onclick="submitScore()">Send to Teacher</button>
-            <button id="play-again-btn" onclick="location.reload()">Play Again</button>
+            <button id="play-again-btn" onclick="resetGame()">Play Again</button>
             <p id="submit-msg" style="font-weight:bold; margin-top:15px;"></p>
         </div>
     </div>
@@ -781,7 +781,7 @@
                 let monsterContainer = document.getElementById('monster-container');
                 monsterContainer.className = stages[currentStageIndex].class;
                 
-            } else if (score < TOTAL_RECIPES) {
+            } else if (score < TOTAL_RECIPES && score > 0) {
                 document.getElementById('speech-bubble').innerText = standardCheers[Math.floor(Math.random() * standardCheers.length)];
             }
 
@@ -839,6 +839,60 @@
                 btn.innerText = "Try Again";
                 btn.disabled = false;
             });
+        }
+
+        // 🔥 全新加入的 resetGame 函數：不需重新整理網頁，完美重置遊戲狀態
+        function resetGame() {
+            // 1. 重設分數與狀態
+            score = 0;
+            currentStageIndex = 0;
+            mistakes = 0;
+            wrongRecords = [];
+            cauldronParts = [];
+
+            // 2. 重設配方完成狀態
+            recipes.forEach(r => r.completed = false);
+
+            // 3. 清理畫面上的殘留部件與大釜
+            cauldron.innerHTML = '';
+            cauldron.className = '';
+            document.querySelectorAll('body > .part').forEach(el => el.remove()); 
+            if (draggedItem) { draggedItem = null; }
+
+            // 4. 重設 UI 文字與進度條
+            document.getElementById('score-count').innerText = '0';
+            document.getElementById('energy-percent').innerText = '0%';
+            document.getElementById('energy-bar').style.width = '0%';
+            document.getElementById('stage-indicator').innerText = stages[0].name;
+            
+            // 5. 重設怪獸狀態與對話框
+            let monsterContainer = document.getElementById('monster-container');
+            monsterContainer.className = "monster-stage-0";
+            document.getElementById('speech-bubble').innerText = "Feed me characters!";
+
+            // 6. 重設彈跳視窗狀態與按鈕
+            document.getElementById('modal-overlay').style.display = 'none';
+            document.getElementById('student-name').value = '';
+            document.getElementById('submit-msg').innerText = '';
+            let submitBtn = document.getElementById('modal-submit-btn');
+            submitBtn.innerText = "Send to Teacher";
+            submitBtn.disabled = false;
+            submitBtn.style.display = "inline-block"; 
+            document.getElementById('play-again-btn').style.display = "none"; 
+
+            // 7. 重新啟動計時器
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            document.getElementById('timer').innerText = '00:00';
+            timerInterval = setInterval(() => {
+                let diff = Math.floor((Date.now() - startTime) / 1000);
+                let m = String(Math.floor(diff / 60)).padStart(2, '0');
+                let s = String(diff % 60).padStart(2, '0');
+                document.getElementById('timer').innerText = m + ':' + s;
+            }, 1000);
+
+            // 8. 重新產生所有部件，遊戲重新開始！
+            initParts();
         }
     </script>
 </body>
