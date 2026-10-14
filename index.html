@@ -23,50 +23,47 @@
 
         header {
             flex: 0 0 auto;
-            padding: 8px 15px;
+            padding: 6px 12px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
+            flex-direction: column;
+            gap: 4px;
             background: #ffffff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             z-index: 100;
-            align-items: center;
-            justify-content: space-between;
         }
 
         .header-top {
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            justify-content: space-between;
             width: 100%;
         }
 
         .stage-pill {
             background: linear-gradient(135deg, #a78bfa, #8b5cf6);
             color: white;
-            padding: 5px 12px;
+            padding: 4px 10px;
             border-radius: 30px;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
         }
 
         .progress-text {
-            font-weight: bold; color: #4a5568; font-size: 0.95rem;
+            font-weight: bold; color: #4a5568; font-size: 0.9rem;
             display: flex; align-items: center; gap: 8px;
         }
 
         .timer-display {
-            background: #edf2f7; padding: 3px 8px; border-radius: 8px;
-            color: #2b6cb0; border: 2px solid #e2e8f0; font-size: 0.9rem;
+            background: #edf2f7; padding: 2px 8px; border-radius: 6px;
+            color: #2b6cb0; border: 2px solid #e2e8f0; font-size: 0.85rem;
         }
 
-        .btn-group { display: flex; gap: 6px; margin-left: auto; }
+        .btn-group { display: flex; gap: 6px; }
         
         .action-btn {
             color: white; border: none; padding: 5px 10px;
-            font-size: 0.9rem; border-radius: 8px; cursor: pointer;
+            font-size: 0.85rem; border-radius: 6px; cursor: pointer;
             font-weight: bold; transition: all 0.2s;
         }
         #fullscreen-btn { background: #4299e1; box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3); }
@@ -74,86 +71,87 @@
         #end-game-btn { background: #e53e3e; box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3); }
         #end-game-btn:hover { background: #c53030; transform: translateY(-2px); }
 
-        .energy-container { display: flex; flex-direction: column; gap: 3px; min-width: 180px; flex: 1; }
-        .energy-labels { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: bold; color: #718096; }
-        .energy-bar-bg { background-color: #e2e8f0; height: 10px; border-radius: 10px; overflow: hidden; position: relative; }
+        .energy-container { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+        .energy-labels { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: bold; color: #718096; }
+        .energy-bar-bg { background-color: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden; position: relative; }
         .energy-bar-fill { background: linear-gradient(90deg, #ff7e5f, #feb47b); height: 100%; width: 0%; border-radius: 10px; transition: width 0.5s ease-out; }
 
         /* =========================================
-           🔥 黃金 50% / 50% 比例配置 🔥
+           🔥 嚴格 50% / 50% 比例配置 🔥
            ========================================= */
         #game-board {
             flex: 1 1 auto;
             display: flex;
             flex-direction: column;
             overflow: hidden; 
-            padding: 8px;
-            gap: 8px;
+            padding: 6px;
+            gap: 6px;
             box-sizing: border-box;
-            height: calc(100dvh - 75px);
+            height: calc(100dvh - 65px);
         }
 
-        /* 上半部：佔 50%，放置怪獸與大鍋子 */
+        /* 上半部：佔精準 50%，放置怪獸與大鍋子 */
         #play-area {
             flex: 0 0 50%;
             display: flex;
             flex-direction: row;
-            gap: 8px;
+            gap: 6px;
             box-sizing: border-box;
             min-height: 0;
         }
 
         .panel {
-            background: #ffffff; border-radius: 12px; padding: 8px;
+            background: #ffffff; border-radius: 12px; padding: 6px;
             display: flex; flex-direction: column; align-items: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.04); box-sizing: border-box;
         }
 
         #left-panel { flex: 1; justify-content: center; position: relative; background: transparent; box-shadow: none; padding: 0; }
-        #center-panel { flex: 1.1; justify-content: flex-start; border: 3px dashed #cbd5e0; background: #f8fafc; }
+        #center-panel { flex: 1.1; justify-content: flex-start; border: 2px dashed #cbd5e0; background: #f8fafc; }
         
-        /* 下半部：佔 50%，專屬獨立滑動的積木庫 */
+        /* 下半部：佔精準 50%，專屬獨立滑動的積木庫 */
         #right-panel { 
             flex: 0 0 50%; display: flex; flex-direction: column; 
-            background: #ffffff; border-radius: 12px; padding: 8px; 
+            background: #ffffff; border-radius: 12px; padding: 6px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.04); min-height: 0;
         }
 
-        .panel-title { font-size: 1rem; font-weight: bold; margin-bottom: 2px; color: #2d3748; text-align: center; }
+        .panel-title { font-size: 0.9rem; font-weight: bold; margin-bottom: 2px; color: #2d3748; text-align: center; }
         
         #cauldron { flex-grow: 1; width: 100%; border-radius: 10px; position: relative; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
 
         #parts-container {
             flex: 1 1 auto; width: 100%; display: flex; flex-wrap: wrap; align-content: flex-start; 
-            gap: 8px; overflow-y: auto; padding-right: 4px; padding-bottom: 20px; position: relative;
+            gap: 6px; overflow-y: auto; padding-right: 4px; padding-bottom: 20px; position: relative;
         }
         #parts-container::-webkit-scrollbar { width: 6px; }
         #parts-container::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 3px; }
 
         .part {
             font-family: "DFKai-SB", "BiauKai", "KaiTi", "STKaiti", "楷體", serif;
-            background: #48bb78; color: #ffffff; font-size: 1.7rem; font-weight: normal;
-            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; box-shadow: 0 4px 0 #38a169, 0 6px 8px rgba(0,0,0,0.1); 
+            background: #48bb78; color: #ffffff; font-size: 1.6rem; font-weight: normal;
+            width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; box-shadow: 0 3px 0 #38a169, 0 5px 6px rgba(0,0,0,0.1); 
             touch-action: none; 
             z-index: 10; transition: transform 0.1s, box-shadow 0.1s, background 0.15s; cursor: pointer;
         }
 
-        .part:hover { background: #f6e05e; color: #2d3748; box-shadow: 0 4px 0 #d69e2e, 0 6px 8px rgba(0,0,0,0.1); }
+        .part:hover { background: #f6e05e; color: #2d3748; box-shadow: 0 3px 0 #d69e2e, 0 5px 6px rgba(0,0,0,0.1); }
         .part.dragging { box-shadow: 0 15px 25px rgba(214, 158, 46, 0.4); transform: scale(1.15) !important; z-index: 9999 !important; background: #f6e05e !important; border: 3px solid #d69e2e !important; color: #2d3748 !important; }
 
-        /* 怪獸與對話框放大優化 */
-        #monster-svg { width: clamp(150px, 35vh, 220px); height: clamp(150px, 35vh, 220px); overflow: visible; }
+        /* 上半部怪獸尺寸最大化配置 */
+        #monster-svg { width: clamp(130px, 28vh, 200px); height: clamp(130px, 28vh, 200px); overflow: visible; }
 
         .speech-bubble {
-            background: white; border: 2px solid #e2e8f0; border-radius: 15px;
-            font-weight: bold; color: #4a5568; position: relative; padding: 5px 12px;
-            font-size: 0.85rem; box-shadow: 0 6px 15px rgba(0,0,0,0.05); text-align: center;
-            animation: float 3s ease-in-out infinite; z-index: 20; margin-bottom: 4px;
+            background: white; border: 2px solid #e2e8f0; border-radius: 12px;
+            font-weight: bold; color: #4a5568; position: relative; padding: 4px 10px;
+            font-size: 0.78rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center;
+            animation: float 3s ease-in-out infinite; z-index: 20; margin-bottom: 3px;
+            max-width: 95%; line-height: 1.2;
         }
-        .speech-bubble::after { content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); border-width: 6px 6px 0; border-style: solid; border-color: white transparent transparent transparent; }
-        .speech-bubble::before { content: ''; position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); border-width: 8px 8px 0; border-style: solid; border-color: #e2e8f0 transparent transparent transparent; z-index: -1; }
+        .speech-bubble::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border-width: 5px 5px 0; border-style: solid; border-color: white transparent transparent transparent; }
+        .speech-bubble::before { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); border-width: 7px 7px 0; border-style: solid; border-color: #e2e8f0 transparent transparent transparent; z-index: -1; }
 
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
@@ -179,7 +177,7 @@
         @keyframes starTwinkle { 0%, 100% { transform: scale(1) rotate(0deg); fill: #f6e05e; } 50% { transform: scale(1.2) rotate(20deg); fill: #fff382; } }
         .star-anim { transform-origin: center; animation: starTwinkle 1.5s infinite; }
 
-        @keyframes happyJump { 0%, 100% { transform: translateY(0) scale(1); } 30% { transform: translateY(-20px) scale(1.05); } 50% { transform: translateY(0) scale(0.95); } 70% { transform: translateY(-10px) scale(1.02); } }
+        @keyframes happyJump { 0%, 100% { transform: translateY(0) scale(1); } 30% { transform: translateY(-15px) scale(1.05); } 50% { transform: translateY(0) scale(0.95); } 70% { transform: translateY(-8px) scale(1.02); } }
         .eating-anim { animation: happyJump 0.4s ease-out; }
 
         @keyframes combinePulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.5); filter: brightness(1.2); color: #f6e05e; border-color: #f6e05e; } 100% { transform: scale(1.2); filter: brightness(1); } }
@@ -195,14 +193,14 @@
         .respawn-anim { animation: respawnAnim 0.4s forwards !important; }
 
         #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 3000; }
-        #modal-box { background: white; padding: 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-        #modal-box h2 { color: #e53e3e; font-size: 1.8rem; margin-top: 0; margin-bottom: 10px; }
-        .score-board { background: #f8fafc; border: 2px dashed #cbd5e0; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
-        .score-board p { margin: 5px 0; font-size: 1.2rem; font-weight: bold; color: #4a5568; }
-        #modal-box input { font-size: 1.1rem; padding: 12px; margin: 10px 0 20px 0; width: 85%; border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s; }
+        #modal-box { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 85%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        #modal-box h2 { color: #e53e3e; font-size: 1.6rem; margin-top: 0; margin-bottom: 10px; }
+        .score-board { background: #f8fafc; border: 2px dashed #cbd5e0; border-radius: 12px; padding: 12px; margin-bottom: 15px; }
+        .score-board p { margin: 4px 0; font-size: 1.1rem; font-weight: bold; color: #4a5568; }
+        #modal-box input { font-size: 1.1rem; padding: 10px; margin: 8px 0 15px 0; width: 85%; border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s; }
         #modal-box input:focus { border-color: #8b5cf6; }
-        #modal-submit-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
-        #play-again-btn { background: #48bb78; color: white; border: none; padding: 12px 30px; font-size: 1.1rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; display: none; margin-top: 10px; }
+        #modal-submit-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; padding: 10px 25px; font-size: 1.05rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
+        #play-again-btn { background: #48bb78; color: white; border: none; padding: 10px 25px; font-size: 1.05rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -313,23 +311,24 @@
         </div>
 
         <div id="right-panel">
-            <div class="panel-title" style="font-size: 0.95rem; margin-bottom: 4px; color: #718096;">🧩 Parts Inventory</div>
+            <div class="panel-title" style="font-size: 0.9rem; margin-bottom: 3px; color: #718096;">🧩 Parts Inventory</div>
             <div id="parts-container"></div>
         </div>
     </div>
 
     <div id="modal-overlay">
         <div id="modal-box">
-            <h2 id="modal-title">🎉 Ultimate Evolution Complete!</h2>
+            <!-- 🔥 成績傳送門英文標題 -->
+            <h2 id="modal-title">🚪 Score Portal</h2>
             <div class="score-board">
-                <p>🏆 Correct: <span id="final-score" style="color: #e53e3e; font-size: 1.5rem;">0</span> / 31</p>
+                <p>🏆 Correct Answers: <span id="final-score" style="color: #e53e3e; font-size: 1.4rem;">0</span> / 31</p>
                 <p>⏱️ Time Taken: <span id="final-time" style="color: #3182ce;">00:00</span></p>
             </div>
-            <p style="color: #718096; font-weight: bold; margin-bottom: 5px;">Please enter your name for the teacher:</p>
-            <input type="text" id="student-name" placeholder="e.g., Jin">
-            <button id="modal-submit-btn" onclick="submitScore()">Submit Score</button>
+            <p style="color: #718096; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem;">Enter your name to submit your score:</p>
+            <input type="text" id="student-name" placeholder="e.g., Alex">
+            <button id="modal-submit-btn" onclick="submitScore()">Submit Score to Teacher</button>
             <button id="play-again-btn" onclick="location.reload()">Play Again</button>
-            <p id="submit-msg" style="font-weight:bold; margin-top:15px;"></p>
+            <p id="submit-msg" style="font-weight:bold; margin-top:12px; font-size: 0.9rem;"></p>
         </div>
     </div>
 
@@ -391,19 +390,27 @@
             { score: 31, class: "monster-stage-4", name: "Stage 4: ON FIRE!!!" } 
         ];
 
-        // 🔥 多樣化且優雅的專業英語教師正向鼓勵語
+        // 🔥 超過 15 句完全不同、文雅且道地的美國英語教師正向鼓勵全句
         const standardCheers = [
-            "Excellent job!", "You're doing fantastic!", "Spot on! Brilliant!",
-            "Keep up the great work!", "That's exactly right!", "Perfect match!",
-            "You're a natural at this!", "Outstanding!", "Magnificent progress!",
-            "You've got this nailed down!", "Brilliant thinking!"
+            "You are doing an absolute stellar job!",
+            "Magnificent work! Your progress is truly inspiring.",
+            "Spot on! Your attention to detail is wonderful.",
+            "Keep up this brilliant momentum!",
+            "That is precisely correct! Outstanding analysis.",
+            "A flawless combination! You have a great eye for characters.",
+            "You are mastering these radicals with great ease!",
+            "Phenomenal effort! Let's keep exploring.",
+            "Your dedication to learning is shining through!",
+            "That was exceptionally well put together!",
+            "Brilliant thinking! You're making amazing headway.",
+            "Wonderful precision! Keep going strong."
         ];
         
         const stageUpCheers = [
-            "Wonderful! Look, I'm growing horns!", 
-            "Amazing! I've got my wings! You're incredible!", 
-            "I have arms and legs now! Keep feeding me!", 
-            "ROAAAAR!!! I am ON FIRE!!! Absolute perfection!" 
+            "Splendid! Look at me, I'm growing magnificent horns!", 
+            "Extraordinary! I've earned my wings thanks to your brilliance!", 
+            "Look at that, I have arms and legs now! Keep feeding me your wisdom!", 
+            "ROAAAAR! I am blazing with ultimate power! Absolute perfection achieved!" 
         ];
 
         const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
@@ -452,7 +459,7 @@
                     btn.innerText = "⛶ Full Screen";
                 }
             } catch (err) {
-                alert("Sorry, full screen is not supported on this browser.");
+                alert("Full screen mode is not supported on this device.");
             }
         }
 
@@ -660,7 +667,7 @@
                 wrongRecords.push(`${charA}+${charB}(${errorLabel})`); 
 
                 cauldron.classList.add('error-anim');
-                document.getElementById('speech-bubble').innerText = "Oops! Not quite right. Try again!";
+                document.getElementById('speech-bubble').innerText = "Oops! That combination isn't quite right. Let's try another one!";
                 
                 pA.classList.add('vanish-anim');
                 pB.classList.add('vanish-anim');
@@ -721,7 +728,7 @@
             if(isWin) {
                 document.getElementById('modal-title').innerText = "🎉 Ultimate Evolution Complete!";
             } else {
-                document.getElementById('modal-title').innerText = "🏁 Game Over!";
+                document.getElementById('modal-title').innerText = "🏁 Game Ended!";
                 document.getElementById('modal-title').style.color = "#4a5568";
             }
         }
@@ -731,7 +738,7 @@
             if(!name) { alert("Please enter your name!"); return; }
             
             let btn = document.getElementById('modal-submit-btn');
-            btn.innerText = "Submitting...";
+            btn.innerText = "Submitting Score...";
             btn.disabled = true;
 
             const formData = new URLSearchParams();
@@ -756,13 +763,13 @@
                 mode: 'no-cors', 
                 body: formData
             }).then(() => {
-                document.getElementById('submit-msg').innerText = "✅ Score submitted successfully!";
+                document.getElementById('submit-msg').innerText = "✅ Score successfully sent to the teacher!";
                 document.getElementById('submit-msg').style.color = "#48bb78";
                 btn.style.display = "none";
                 document.getElementById('play-again-btn').style.display = "inline-block";
             }).catch(err => {
                 console.error(err);
-                document.getElementById('submit-msg').innerText = "❌ Failed to submit. Please check your connection.";
+                document.getElementById('submit-msg').innerText = "❌ Submission failed. Please check your network connection.";
                 document.getElementById('submit-msg').style.color = "#fc8181";
                 btn.innerText = "Try Again";
                 btn.disabled = false;
