@@ -7,17 +7,16 @@
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7fe; 
+            background-color: #f4f7fe;
             color: #2d3748;
             margin: 0;
             padding: 0;
-            height: 100vh; 
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            /* 🔥 防止手機瀏覽器被不小心下拉重新整理 */
-            overscroll-behavior: none; 
-            overflow: hidden; 
-            user-select: none; 
+            overscroll-behavior: none;
+            overflow: hidden;
+            user-select: none;
             -webkit-user-select: none;
         }
 
@@ -125,14 +124,14 @@
             box-sizing: border-box;
         }
 
-        #left-panel { 
-            flex: 1; 
-            justify-content: center; 
-            position: relative; 
+        #left-panel {
+            flex: 1;
+            justify-content: center;
+            position: relative;
             background: transparent;
             box-shadow: none;
         }
-        
+
         .speech-bubble {
             background: white;
             border: 2px solid #e2e8f0;
@@ -170,15 +169,15 @@
             align-items: center;
             transition: all 0.3s;
         }
-        
+
         #monster-svg {
             width: 280px;
             height: 280px;
             overflow: visible;
         }
-        
+
         #monster-container .monster-part { opacity: 0; transition: opacity 0.8s ease; transform-origin: center; }
-        
+
         #monster-container.monster-stage-1 .stage-1-part { opacity: 1; }
         #monster-container.monster-stage-2 .stage-1-part, #monster-container.monster-stage-2 .stage-2-part { opacity: 1; }
         #monster-container.monster-stage-3 .stage-1-part, #monster-container.monster-stage-3 .stage-2-part, #monster-container.monster-stage-3 .stage-3-part { opacity: 1; }
@@ -213,7 +212,7 @@
         }
         .eating-anim { animation: happyJump 0.5s ease-out; }
 
-        #center-panel { 
+        #center-panel {
             flex: 1.2; justify-content: flex-start; border: 3px dashed #cbd5e0; background: #f8fafc;
         }
         .panel-title { font-size: 1.15rem; font-weight: bold; margin-bottom: 5px; color: #2d3748; text-align: center; }
@@ -223,7 +222,7 @@
         }
         #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
 
-        #right-panel { flex: 1.5; display: flex; flex-direction: column; }
+        #right-panel { flex: 1.5; display: flex; flex-direction: column; overflow: hidden; }
         #parts-container {
             flex-grow: 1; width: 100%; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; overflow-y: auto; padding-right: 5px; position: relative;
         }
@@ -234,7 +233,7 @@
             font-family: "DFKai-SB", "BiauKai", "KaiTi", "STKaiti", "楷體", serif;
             background: #48bb78; color: #ffffff; font-size: 1.8rem; font-weight: normal;
             width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; box-shadow: 0 4px 0 #38a169, 0 6px 8px rgba(0,0,0,0.1); 
+            border-radius: 12px; box-shadow: 0 4px 0 #38a169, 0 6px 8px rgba(0,0,0,0.1);
             touch-action: none; z-index: 10; transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
             cursor: url('data:image/svg+xml;utf8,%3Csvg%20width%3D%2228%22%20height%3D%2228%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23f6e05e%22%20stroke%3D%22%232d3748%22%20stroke-width%3D%221%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M10.5%202C10.5%201.2%2011.2%200.5%2012%200.5C12.8%200.5%2013.5%201.2%2013.5%202V8H14.5C14.5%207.2%2015.2%206.5%2016%206.5C16.8%206.5%2017.5%207.2%2017.5%208V9H18.5C18.5%208.2%2019.2%207.5%2020%207.5C20.8%207.5%2021.5%208.2%2021.5%209V14C21.5%2018.5%2017.5%2022%2013%2022C8.5%2022%205.5%2018%205.5%2013V11C5.5%2010.2%206.2%209.5%207%209.5C7.8%209.5%208.5%2010.2%208.5%2011V12H9.5V4C9.5%203.2%2010.2%202.5%2011%202.5C11%202.5%2010.5%202%2010.5%202Z%22%2F%3E%3C%2Fsvg%3E') 14 14, grab;
         }
@@ -274,45 +273,43 @@
             border: 2px solid #e2e8f0; border-radius: 10px; text-align: center; outline: none; transition: 0.3s;
         }
         #modal-box input:focus { border-color: #8b5cf6; }
-        
+
         #modal-submit-btn {
-            background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; 
-            border: none; padding: 12px 30px; font-size: 1.1rem; 
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white;
+            border: none; padding: 12px 30px; font-size: 1.1rem;
             border-radius: 10px; cursor: pointer; font-weight: bold;
             width: 100%; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
         }
-        
+
         #play-again-btn {
-            background: #48bb78; color: white; 
-            border: none; padding: 12px 30px; font-size: 1.1rem; 
+            background: #48bb78; color: white;
+            border: none; padding: 12px 30px; font-size: 1.1rem;
             border-radius: 10px; cursor: pointer; font-weight: bold;
             width: 100%; box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
             display: none; margin-top: 10px;
         }
         #play-again-btn:hover { background: #38a169; }
 
-        /* 🔥 手機直向模式 (原本的排版) */
         @media (max-width: 900px) and (orientation: portrait) {
             #game-board { flex-direction: column; overflow-y: auto; height: auto; }
             body { height: auto; overflow: auto; }
             #left-panel, #center-panel { min-height: 250px; }
         }
 
-        /* 🔥 手機橫向模式 (解決打橫無法遊玩的問題) */
         @media (max-height: 500px) and (orientation: landscape) {
             header { flex-direction: row; padding: 5px 15px; }
             .header-top { flex: 1; gap: 10px; }
             .energy-container { flex: 1; margin-left: 20px; }
-            
+
             #game-board { flex-direction: row; height: calc(100vh - 65px); padding: 5px 10px; gap: 10px; }
             body { height: 100vh; overflow: hidden; }
-            
+
             #left-panel, #center-panel { min-height: unset; flex: 1; }
             #right-panel { flex: 1.5; }
-            
+
             #monster-svg { width: 130px; height: 130px; }
             .speech-bubble { font-size: 0.8rem; padding: 4px 10px; margin-bottom: 5px; }
-            
+
             .part { width: 40px; height: 40px; font-size: 1.3rem; }
             .panel { padding: 8px; }
             .panel-title { font-size: 0.95rem; margin-bottom: 2px; }
@@ -345,7 +342,7 @@
     <div id="game-board">
         <div id="left-panel" class="panel">
             <div class="speech-bubble" id="speech-bubble">Feed me characters!</div>
-            
+
             <div id="monster-container" class="monster-stage-0">
                 <svg id="monster-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
                     <defs>
@@ -382,7 +379,7 @@
                     </g>
 
                     <circle cx="150" cy="150" r="70" fill="url(#bodyGrad)" />
-                    <ellipse cx="150" cy="180" rx="40" ry="30" fill="#FDE047" /> 
+                    <ellipse cx="150" cy="180" rx="40" ry="30" fill="#FDE047" />
 
                     <g class="monster-part stage-1-part">
                         <path d="M 115 100 Q 90 50 100 40 Q 125 70 130 90 Z" fill="#F6E05E" stroke="#B7791F" stroke-width="2"/>
@@ -393,18 +390,18 @@
                         <circle cx="150" cy="105" r="16" fill="white" />
                         <circle cx="150" cy="105" r="8" fill="#3E2723" />
                         <circle cx="147" cy="102" r="3" fill="white" />
-                        
+
                         <circle cx="115" cy="130" r="18" fill="white" />
                         <circle cx="120" cy="130" r="9" fill="#3E2723" />
                         <circle cx="117" cy="127" r="3" fill="white" />
-                        
+
                         <circle cx="185" cy="130" r="18" fill="white" />
                         <circle cx="180" cy="130" r="9" fill="#3E2723" />
                         <circle cx="177" cy="127" r="3" fill="white" />
-                        
+
                         <path id="cute-mouth-closed" d="M 140 155 Q 150 165 160 155" stroke="#3E2723" stroke-width="4" fill="none" stroke-linecap="round"/>
                         <path id="cute-mouth-open" d="M 135 155 Q 150 180 165 155 Z" fill="#3E2723"/>
-                        
+
                         <ellipse cx="95" cy="145" rx="8" ry="4" fill="#FC8181" opacity="0.6"/>
                         <ellipse cx="205" cy="145" rx="8" ry="4" fill="#FC8181" opacity="0.6"/>
                     </g>
@@ -412,20 +409,20 @@
                     <g id="angry-face" class="monster-part stage-4-part">
                         <circle cx="150" cy="105" r="16" fill="white" />
                         <circle cx="150" cy="105" r="7" fill="#c53030" />
-                        <path d="M 135 95 L 165 95 L 150 80 Z" fill="url(#bodyGrad)" /> 
-                        
+                        <path d="M 135 95 L 165 95 L 150 80 Z" fill="url(#bodyGrad)" />
+
                         <circle cx="115" cy="130" r="18" fill="white" />
                         <circle cx="120" cy="130" r="8" fill="#c53030" />
                         <path d="M 95 115 L 135 125 L 115 100 Z" fill="url(#bodyGrad)" />
-                        
+
                         <circle cx="185" cy="130" r="18" fill="white" />
                         <circle cx="180" cy="130" r="8" fill="#c53030" />
                         <path d="M 205 115 L 165 125 L 185 100 Z" fill="url(#bodyGrad)" />
-                        
+
                         <path d="M 130 155 Q 150 195 170 155 Z" fill="#742A2A"/>
-                        <path d="M 135 155 L 140 165 L 145 155 L 150 165 L 155 155 L 160 165 L 165 155 Z" fill="white"/> 
+                        <path d="M 135 155 L 140 165 L 145 155 L 150 165 L 155 155 L 160 165 L 165 155 Z" fill="white"/>
                     </g>
-                    
+
                     <g class="monster-part stage-4-part fire-aura" style="animation-delay: 0.2s;">
                         <path d="M 70 280 Q 100 200 120 260 Q 150 180 180 260 Q 200 200 230 280 Q 150 320 70 280 Z" fill="#FBD38D" opacity="0.9"/>
                     </g>
@@ -445,7 +442,6 @@
         </div>
     </div>
 
-    <!-- 提交彈窗 -->
     <div id="modal-overlay">
         <div id="modal-box">
             <h2 id="modal-title">🎉 Game Over!</h2>
@@ -494,18 +490,18 @@
             { result: "隻", p1: "隹", p2: "又", layout: "TB", completed: false },
             { result: "青", p1: "龶", p2: "月", layout: "TB", completed: false }
         ];
-        
+
         const rawParts = [
-            "扌", "白", "𠂇", "工", "𠂇", "口", "亻", "尔", "亻", "也", 
-            "辶", "言", "言", "隹", "白", "勺", "禾", "火", "阝", "咅", 
-            "咅", "阝", "氵", "每", "女", "子", "月", "月", "𠂇", "又", 
+            "扌", "白", "𠂇", "工", "𠂇", "口", "亻", "尔", "亻", "也",
+            "辶", "言", "言", "隹", "白", "勺", "禾", "火", "阝", "咅",
+            "咅", "阝", "氵", "每", "女", "子", "月", "月", "𠂇", "又",
             "亻", "門", "走", "巳", "一", "大", "日", "月", "禾", "口",
-            "八", "刀", "口", "阿", "夕", "夕", "王", "元", "至", "刂", 
-            "言", "果", "扌", "立", "龵", "目", "扌", "戈", "隹", "又", 
+            "八", "刀", "口", "阿", "夕", "夕", "王", "元", "至", "刂",
+            "言", "果", "扌", "立", "龵", "目", "扌", "戈", "隹", "又",
             "龶", "月"
         ];
-        
-        const TOTAL_RECIPES = 31; 
+
+        const TOTAL_RECIPES = 31;
         document.getElementById('total-count').innerText = TOTAL_RECIPES;
 
         const stages = [
@@ -513,7 +509,7 @@
             { score: 8, class: "monster-stage-1", name: "Stage 1: Growing Horns" },
             { score: 16, class: "monster-stage-2", name: "Stage 2: Winged Monster" },
             { score: 24, class: "monster-stage-3", name: "Stage 3: Magic Wand" },
-            { score: 31, class: "monster-stage-4", name: "Stage 4: ON FIRE!!!" } 
+            { score: 31, class: "monster-stage-4", name: "Stage 4: ON FIRE!!!" }
         ];
 
         const standardCheers = [
@@ -521,12 +517,12 @@
             "Fantastic work! Feed me more!", "That's exactly right!", "Brilliant move!",
             "You're a natural at this!", "Wow, you figured it out perfectly!"
         ];
-        
+
         const stageUpCheers = [
-            "Wow! Look at me, I'm growing horns!", 
-            "Amazing! I got my wings! You're the best!", 
-            "I have hands now! Keep feeding me!", 
-            "ROAAAAR!!! I am ON FIRE!!! Perfect score!" 
+            "Wow! Look at me, I'm growing horns!",
+            "Amazing! I got my wings! You're the best!",
+            "I have hands now! Keep feeding me!",
+            "ROAAAAR!!! I am ON FIRE!!! Perfect score!"
         ];
 
         const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
@@ -534,9 +530,9 @@
         let score = 0;
         let currentStageIndex = 0;
         let mistakes = 0;
-        let wrongRecords = []; 
-        let cauldronParts = []; 
-        
+        let wrongRecords = [];
+        let cauldronParts = [];
+
         let startTime = Date.now();
         let timerInterval = setInterval(() => {
             let diff = Math.floor((Date.now() - startTime) / 1000);
@@ -548,8 +544,8 @@
         const partsContainer = document.getElementById('parts-container');
         function initParts() {
             partsContainer.innerHTML = '';
-            let shuffled = rawParts.sort(() => Math.random() - 0.5);
-            shuffled.forEach((char, index) => {
+            let shuffled = [...rawParts].sort(() => Math.random() - 0.5);
+            shuffled.forEach((char) => {
                 let div = document.createElement('div');
                 div.className = 'part';
                 div.innerText = char;
@@ -568,7 +564,6 @@
             el.addEventListener('touchstart', dragStart, { passive: false });
         }
 
-        // 🔥 核心修正：升級座標追蹤方式，解決手機版往下捲動時拖曳物會亂飛的問題！
         function moveAt(e) {
             let pageX = e.type.includes('mouse') ? e.pageX : e.touches[0].pageX;
             let pageY = e.type.includes('mouse') ? e.pageY : e.touches[0].pageY;
@@ -581,7 +576,7 @@
             e.preventDefault();
             draggedItem = e.target;
             draggedItem.classList.add('dragging');
-            document.body.appendChild(draggedItem); 
+            document.body.appendChild(draggedItem);
             moveAt(e);
 
             window.addEventListener('mousemove', dragMove);
@@ -598,7 +593,7 @@
             let clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
             let clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
             let cauldronRect = cauldron.getBoundingClientRect();
-            
+
             if (clientX > cauldronRect.left && clientX < cauldronRect.right &&
                 clientY > cauldronRect.top && clientY < cauldronRect.bottom) {
                 cauldron.classList.add('highlight');
@@ -618,17 +613,17 @@
 
             if (clientX > cauldronRect.left && clientX < cauldronRect.right &&
                 clientY > cauldronRect.top && clientY < cauldronRect.bottom) {
-                
+
                 if (draggedItem.parentElement !== cauldron) {
                     cauldron.appendChild(draggedItem);
                     cauldronParts.push(draggedItem);
                 }
-                
+
                 draggedItem.style.left = (clientX - cauldronRect.left - draggedItem.offsetWidth/2) + 'px';
                 draggedItem.style.top = (clientY - cauldronRect.top - draggedItem.offsetHeight/2) + 'px';
-                
+
                 if (cauldronParts.length === 2) {
-                    setTimeout(checkRecipe, 150); 
+                    setTimeout(checkRecipe, 150);
                 }
             } else {
                 resetPart(draggedItem);
@@ -654,7 +649,7 @@
             if (cauldronParts.length < 2) return;
             let pA = cauldronParts[0];
             let pB = cauldronParts[1];
-            
+
             let charA = pA.dataset.char;
             let charB = pB.dataset.char;
 
@@ -676,14 +671,14 @@
                     let node2_cy = A_is_p1 ? cyB : cyA;
 
                     let isValid = false;
-                    
+
                     if (r.p1 === r.p2) {
                         isValid = true;
                     } else {
                         if (r.layout === "LR") {
-                            if (node1_cx <= node2_cx + 50) isValid = true; 
+                            if (node1_cx <= node2_cx + 50) isValid = true;
                         } else if (r.layout === "TB") {
-                            if (node1_cy <= node2_cy + 50) isValid = true; 
+                            if (node1_cy <= node2_cy + 50) isValid = true;
                         }
                     }
 
@@ -712,7 +707,7 @@
                     let monsterContainer = document.getElementById('monster-container');
                     let monsterRect = monsterContainer.getBoundingClientRect();
                     let pARect = pA.getBoundingClientRect();
-                    
+
                     let moveX = (monsterRect.left + monsterRect.width/2) - (pARect.left + pARect.width/2);
                     let moveY = (monsterRect.top + monsterRect.height/2) - (pARect.top + pARect.height/2);
 
@@ -726,14 +721,14 @@
                         pA.remove();
                         pB.remove();
                         cauldronParts = [];
-                        
+
                         score++;
                         document.getElementById('score-count').innerText = score;
-                        
+
                         monsterContainer.classList.add('eating-anim');
                         setTimeout(() => {
                             monsterContainer.classList.remove('eating-anim');
-                            monsterContainer.classList.remove('is-eating'); 
+                            monsterContainer.classList.remove('is-eating');
                         }, 500);
 
                         updateProgress();
@@ -746,12 +741,12 @@
                 let dx = cxB - cxA;
                 let dy = cyB - cyA;
                 let errorLabel = Math.abs(dx) > Math.abs(dy) ? "L/R" : "T/B";
-                
-                wrongRecords.push(`${charA}+${charB}(${errorLabel})`); 
+
+                wrongRecords.push(`${charA}+${charB}(${errorLabel})`);
 
                 cauldron.classList.add('error-anim');
                 document.getElementById('speech-bubble').innerText = "Oops! Try again.";
-                
+
                 setTimeout(() => {
                     cauldron.classList.remove('error-anim');
                     resetPart(pA);
@@ -777,10 +772,10 @@
             if (newStageIndex > currentStageIndex) {
                 document.getElementById('speech-bubble').innerText = stageUpCheers[newStageIndex - 1];
                 currentStageIndex = newStageIndex;
-                
+
                 let monsterContainer = document.getElementById('monster-container');
                 monsterContainer.className = stages[currentStageIndex].class;
-                
+
             } else if (score < TOTAL_RECIPES) {
                 document.getElementById('speech-bubble').innerText = standardCheers[Math.floor(Math.random() * standardCheers.length)];
             }
@@ -801,31 +796,31 @@
         function submitScore() {
             let name = document.getElementById('student-name').value;
             if(!name) { alert("Please enter your name!"); return; }
-            
+
             let btn = document.getElementById('modal-submit-btn');
             btn.innerText = "Submitting...";
             btn.disabled = true;
 
             const formData = new URLSearchParams();
-            formData.append('score', score); 
+            formData.append('score', score);
             formData.append('name', name);
             formData.append('studentName', name);
             formData.append('學生姓名', name);
-            
+
             let wrongDetail = wrongRecords.length > 0 ? `${mistakes} mistakes (${wrongRecords.join(', ')})` : "Perfect";
-            formData.append('wrongAnswers', wrongDetail); 
+            formData.append('wrongAnswers', wrongDetail);
             formData.append('mistakes', wrongDetail);
             formData.append('錯題紀錄', wrongDetail);
-            
+
             let timeString = document.getElementById('timer').innerText;
-            formData.append('timeTaken', timeString); 
-            formData.append('作答時間', timeString); 
-            
+            formData.append('timeTaken', timeString);
+            formData.append('作答時間', timeString);
+
             formData.append('gameName', 'Monster Evolution Final');
 
             fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors', 
+                mode: 'no-cors',
                 body: formData
             }).then(() => {
                 document.getElementById('submit-msg').innerText = "✅ Submitted successfully!";
@@ -851,28 +846,25 @@
 
             recipes.forEach(r => r.completed = false);
 
-            document.getElementById('score-count').innerText = score;
-            document.getElementById('energy-percent').innerText = "0%";
-            document.getElementById('energy-bar').style.width = "0%";
-            
-            let monsterContainer = document.getElementById('monster-container');
-            monsterContainer.className = stages[0].class;
+            document.getElementById('score-count').innerText = '0';
+            document.getElementById('energy-percent').innerText = '0%';
+            document.getElementById('energy-bar').style.width = '0%';
             document.getElementById('stage-indicator').innerText = stages[0].name;
+            document.getElementById('monster-container').className = stages[0].class;
             document.getElementById('speech-bubble').innerText = "Feed me characters!";
 
-            let cauldron = document.getElementById('cauldron');
             cauldron.innerHTML = '';
             cauldron.classList.remove('highlight', 'error-anim');
+            document.querySelectorAll('body > .part').forEach(el => el.remove());
 
-            document.querySelectorAll('.part').forEach(el => el.remove());
-            
             document.getElementById('modal-overlay').style.display = 'none';
             document.getElementById('student-name').value = '';
             document.getElementById('submit-msg').innerText = '';
+            
             let btn = document.getElementById('modal-submit-btn');
             btn.innerText = "Send to Teacher";
             btn.disabled = false;
-            btn.style.display = ""; 
+            btn.style.display = "inline-block";
             document.getElementById('play-again-btn').style.display = "none";
 
             clearInterval(timerInterval);
