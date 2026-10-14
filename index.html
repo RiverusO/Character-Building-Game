@@ -841,7 +841,6 @@
             });
         }
 
-        // 新增的重置遊戲功能，完全不改變 CSS 與 HTML 結構
         function resetGame() {
             score = 0;
             currentStageIndex = 0;
@@ -865,10 +864,8 @@
             cauldron.innerHTML = '';
             cauldron.classList.remove('highlight', 'error-anim');
 
-            // 移除畫面上所有的部件，確保不會有舊部件殘留
             document.querySelectorAll('.part').forEach(el => el.remove());
             
-            // 隱藏彈跳視窗並重設按鈕狀態
             document.getElementById('modal-overlay').style.display = 'none';
             document.getElementById('student-name').value = '';
             document.getElementById('submit-msg').innerText = '';
@@ -878,7 +875,6 @@
             btn.style.display = ""; 
             document.getElementById('play-again-btn').style.display = "none";
 
-            // 重設計時器
             clearInterval(timerInterval);
             startTime = Date.now();
             document.getElementById('timer').innerText = '00:00';
@@ -889,7 +885,6 @@
                 document.getElementById('timer').innerText = m + ':' + s;
             }, 1000);
 
-            // 重新初始化所有字卡
             initParts();
         }
     </script>
