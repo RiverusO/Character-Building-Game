@@ -76,9 +76,6 @@
         .energy-bar-bg { background-color: #e2e8f0; height: 8px; border-radius: 10px; overflow: hidden; position: relative; }
         .energy-bar-fill { background: linear-gradient(90deg, #ff7e5f, #feb47b); height: 100%; width: 0%; border-radius: 10px; transition: width 0.5s ease-out; }
 
-        /* =========================================
-           🔥 嚴格 50% / 50% 上下黃金比例 🔥
-           ========================================= */
         #game-board {
             flex: 1 1 auto;
             display: flex;
@@ -90,7 +87,6 @@
             height: calc(100dvh - 65px);
         }
 
-        /* 上半部：佔 50% */
         #play-area {
             flex: 0 0 50%;
             display: flex;
@@ -106,11 +102,9 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.04); box-sizing: border-box;
         }
 
-        /* 上半部內部 50% / 50% 分割（怪獸區 vs 大鍋區） */
         #left-panel { flex: 1; justify-content: center; position: relative; background: transparent; box-shadow: none; padding: 0; }
         #center-panel { flex: 1; justify-content: flex-start; border: 2px dashed #cbd5e0; background: #f8fafc; }
         
-        /* 下半部：佔 50% */
         #right-panel { 
             flex: 0 0 50%; 
             display: flex; 
@@ -129,7 +123,6 @@
         #cauldron { flex-grow: 1; width: 100%; border-radius: 10px; position: relative; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         #cauldron.highlight { background: rgba(246, 224, 94, 0.15); border: 2px solid #d69e2e; }
 
-        /* 🔥 寬大好拉的滾動拉條 */
         #parts-container {
             flex: 1 1 auto; 
             width: 100%; 
@@ -222,15 +215,35 @@
         #modal-box input:focus { border-color: #8b5cf6; }
         #modal-submit-btn { background: linear-gradient(135deg, #a78bfa, #8b5cf6); color: white; border: none; padding: 10px 25px; font-size: 1.05rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; }
         #play-again-btn { background: #48bb78; color: white; border: none; padding: 10px 25px; font-size: 1.05rem; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; display: none; margin-top: 10px; }
+
+        /* 🔥 過關鼓勵大圖 Overlay 樣式 (退回原版內建圖示設計) */
+        #stage-clear-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 5000; justify-content: center; align-items: center; flex-direction: column;
+        }
+        #stage-clear-box {
+            transform: scale(0); transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); text-align: center;
+        }
+        #stage-clear-icon { font-size: 8rem; filter: drop-shadow(0 0 25px rgba(246, 224, 94, 0.9)); margin-bottom: 10px; }
+        #stage-clear-title { color: #F6E05E; font-size: 3.5rem; margin: 0; font-weight: 900; letter-spacing: 2px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); line-height: 1.2; }
+        #stage-clear-subtitle { color: white; font-size: 1.5rem; margin-top: 15px; font-weight: bold; line-height: 1.4; }
     </style>
 </head>
 <body>
 
+    <div id="stage-clear-overlay">
+        <div id="stage-clear-box">
+            <div id="stage-clear-icon">🌟</div>
+            <h1 id="stage-clear-title">太棒了！<br><span style="font-size: 2.2rem; color: #fff;">Awesome!</span></h1>
+            <p id="stage-clear-subtitle">準備進入下一階段...<br><span style="font-size: 1.1rem; color: #cbd5e0;">Get ready for the next stage...</span></p>
+        </div>
+    </div>
+
     <header>
         <div class="header-top">
-            <div class="stage-pill" id="stage-indicator">Stage 0: Cute Egg</div>
+            <div class="stage-pill" id="stage-indicator">Stage 1: Cute Egg</div>
             <div class="progress-text">
-                <span><span id="score-count">0</span> / <span id="total-count">31</span></span>
+                <span><span id="score-count">0</span> / <span id="total-count">0</span></span>
                 <span class="timer-display">⏱️ <span id="timer">00:00</span></span>
             </div>
             <div class="btn-group">
@@ -341,7 +354,7 @@
         <div id="modal-box">
             <h2 id="modal-title">🚪 Score Portal</h2>
             <div class="score-board">
-                <p>🏆 Correct Answers: <span id="final-score" style="color: #e53e3e; font-size: 1.4rem;">0</span> / 31</p>
+                <p>🏆 Correct Answers: <span id="final-score" style="color: #e53e3e; font-size: 1.4rem;">0</span></p>
                 <p>⏱️ Time Taken: <span id="final-time" style="color: #3182ce;">00:00</span></p>
             </div>
             <p style="color: #718096; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem;">Enter your name to submit your score:</p>
@@ -355,59 +368,61 @@
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyffejRgG6qazRRYFn3-9Wpc-MLvcL7AGxdLfot266LGxZF5aHzPuaGTeO3zxlf6EM/exec";
 
-        const recipes = [
-            { result: "拍", p1: "扌", p2: "白", layout: "LR", completed: false },
-            { result: "左", p1: "𠂇", p2: "工", layout: "TB", completed: false },
-            { result: "右", p1: "𠂇", p2: "口", layout: "TB", completed: false },
-            { result: "你", p1: "亻", p2: "尔", layout: "LR", completed: false },
-            { result: "他", p1: "亻", p2: "也", layout: "LR", completed: false },
-            { result: "這", p1: "辶", p2: "言", layout: "LR", completed: false },
-            { result: "誰", p1: "言", p2: "隹", layout: "LR", completed: false },
-            { result: "的", p1: "白", p2: "勺", layout: "LR", completed: false },
-            { result: "秋", p1: "禾", p2: "火", layout: "LR", completed: false },
-            { result: "陪", p1: "阝", p2: "咅", layout: "LR", completed: false },
-            { result: "部", p1: "咅", p2: "阝", layout: "LR", completed: false },
-            { result: "海", p1: "氵", p2: "每", layout: "LR", completed: false },
-            { result: "好", p1: "女", p2: "子", layout: "LR", completed: false },
-            { result: "朋", p1: "月", p2: "月", layout: "LR", completed: false },
-            { result: "友", p1: "𠂇", p2: "又", layout: "TB", completed: false },
-            { result: "們", p1: "亻", p2: "門", layout: "LR", completed: false },
-            { result: "起", p1: "走", p2: "巳", layout: "LR", completed: false },
-            { result: "天", p1: "一", p2: "大", layout: "TB", completed: false },
-            { result: "明", p1: "日", p2: "月", layout: "LR", completed: false },
-            { result: "和", p1: "禾", p2: "口", layout: "LR", completed: false },
-            { result: "分", p1: "八", p2: "刀", layout: "TB", completed: false },
-            { result: "啊", p1: "口", p2: "阿", layout: "LR", completed: false },
-            { result: "多", p1: "夕", p2: "夕", layout: "TB", completed: false },
-            { result: "玩", p1: "王", p2: "元", layout: "LR", completed: false },
-            { result: "到", p1: "至", p2: "刂", layout: "LR", completed: false },
-            { result: "課", p1: "言", p2: "果", layout: "LR", completed: false },
-            { result: "拉", p1: "扌", p2: "立", layout: "LR", completed: false },
-            { result: "看", p1: "龵", p2: "目", layout: "TB", completed: false },
-            { result: "找", p1: "扌", p2: "戈", layout: "LR", completed: false },
-            { result: "隻", p1: "隹", p2: "又", layout: "TB", completed: false },
-            { result: "青", p1: "龶", p2: "月", layout: "TB", completed: false }
+        // 🔥 第四階段已移除「左」、「右」、「玩」三個字
+        const stagedRecipes = [
+            // Stage 1 (5 words)
+            { result: "拍", p1: "扌", p2: "白", layout: "LR", stage: 1, completed: false },
+            { result: "左", p1: "𠂇", p2: "工", layout: "TB", stage: 1, completed: false },
+            { result: "右", p1: "𠂇", p2: "口", layout: "TB", stage: 1, completed: false },
+            { result: "你", p1: "亻", p2: "尔", layout: "LR", stage: 1, completed: false },
+            { result: "他", p1: "亻", p2: "也", layout: "LR", stage: 1, completed: false },
+            
+            // Stage 2 (8 words)
+            { result: "這", p1: "辶", p2: "言", layout: "LR", stage: 2, completed: false },
+            { result: "誰", p1: "言", p2: "隹", layout: "LR", stage: 2, completed: false },
+            { result: "的", p1: "白", p2: "勺", layout: "LR", stage: 2, completed: false },
+            { result: "分", p1: "八", p2: "刀", layout: "TB", stage: 2, completed: false },
+            { result: "好", p1: "女", p2: "子", layout: "LR", stage: 2, completed: false },
+            { result: "啊", p1: "口", p2: "阿", layout: "LR", stage: 2, completed: false },
+            { result: "多", p1: "夕", p2: "夕", layout: "TB", stage: 2, completed: false },
+            { result: "個", p1: "亻", p2: "固", layout: "LR", stage: 2, completed: false },
+            
+            // Stage 3 (11 words)
+            { result: "秋", p1: "禾", p2: "火", layout: "LR", stage: 3, completed: false },
+            { result: "千", p1: "丿", p2: "十", layout: "TB", stage: 3, completed: false },
+            { result: "陪", p1: "阝", p2: "咅", layout: "LR", stage: 3, completed: false },
+            { result: "玩", p1: "王", p2: "元", layout: "LR", stage: 3, completed: false },
+            { result: "到", p1: "至", p2: "刂", layout: "LR", stage: 3, completed: false },
+            { result: "海", p1: "氵", p2: "每", layout: "LR", stage: 3, completed: false },
+            { result: "的", p1: "白", p2: "勺", layout: "LR", stage: 3, completed: false },
+            { result: "好", p1: "女", p2: "子", layout: "LR", stage: 3, completed: false },
+            { result: "朋", p1: "月", p2: "月", layout: "LR", stage: 3, completed: false },
+            { result: "友", p1: "𠂇", p2: "又", layout: "TB", stage: 3, completed: false },
+            { result: "部", p1: "咅", p2: "阝", layout: "LR", stage: 3, completed: false },
+            
+            // Stage 4 (11 words)
+            { result: "個", p1: "亻", p2: "固", layout: "LR", stage: 4, completed: false },
+            { result: "起", p1: "走", p2: "巳", layout: "LR", stage: 4, completed: false },
+            { result: "課", p1: "言", p2: "果", layout: "LR", stage: 4, completed: false },
+            { result: "拉", p1: "扌", p2: "立", layout: "LR", stage: 4, completed: false },
+            { result: "看", p1: "龵", p2: "目", layout: "TB", stage: 4, completed: false },
+            { result: "找", p1: "扌", p2: "戈", layout: "LR", stage: 4, completed: false },
+            { result: "青", p1: "龶", p2: "月", layout: "TB", stage: 4, completed: false },
+            { result: "蛙", p1: "虫", p2: "圭", layout: "LR", stage: 4, completed: false },
+            { result: "隻", p1: "隹", p2: "又", layout: "TB", stage: 4, completed: false },
+            { result: "好", p1: "女", p2: "子", layout: "LR", stage: 4, completed: false },
+            { result: "開", p1: "門", p2: "开", layout: "TB", stage: 4, completed: false }
         ];
         
-        const rawParts = [
-            "扌", "白", "𠂇", "工", "𠂇", "口", "亻", "尔", "亻", "也", 
-            "辶", "言", "言", "隹", "白", "勺", "禾", "火", "阝", "咅", 
-            "咅", "阝", "氵", "每", "女", "子", "月", "月", "𠂇", "又", 
-            "亻", "門", "走", "巳", "一", "大", "日", "月", "禾", "口",
-            "八", "刀", "口", "阿", "夕", "夕", "王", "元", "至", "刂", 
-            "言", "果", "扌", "立", "龵", "目", "扌", "戈", "隹", "又", 
-            "龶", "月"
-        ];
-        
-        const TOTAL_RECIPES = 31; 
+        const TOTAL_RECIPES = stagedRecipes.length; 
         document.getElementById('total-count').innerText = TOTAL_RECIPES;
 
         const stages = [
             { score: 0, class: "monster-stage-0", name: "Stage 0: Cute Egg" },
-            { score: 8, class: "monster-stage-1", name: "Stage 1: Growing Horns" },
-            { score: 16, class: "monster-stage-2", name: "Stage 2: Winged Monster" },
+            { score: 5, class: "monster-stage-1", name: "Stage 1: Growing Horns" },
+            { score: 13, class: "monster-stage-2", name: "Stage 2: Winged Monster" },
             { score: 24, class: "monster-stage-3", name: "Stage 3: Magic Wand" },
-            { score: 31, class: "monster-stage-4", name: "Stage 4: ON FIRE!!!" } 
+            { score: 35, class: "monster-stage-4", name: "Stage 4: ON FIRE!!!" } // 總數更新為35
         ];
 
         const standardCheers = [
@@ -416,19 +431,7 @@
             "Spot on! Your attention to detail is wonderful.",
             "Keep up this brilliant momentum!",
             "That is precisely correct! Outstanding analysis.",
-            "A flawless combination! You have a great eye for characters.",
-            "You are mastering these radicals with great ease!",
-            "Phenomenal effort! Let's keep exploring.",
-            "Your dedication to learning is shining through!",
-            "That was exceptionally well put together!",
-            "Brilliant thinking! You're making amazing headway.",
-            "Wonderful precision! Keep going strong.",
-            "Superb matching! You are truly focused today.",
-            "Incredible insight! That character is mastered.",
-            "You're showing fantastic problem-solving skills!",
-            "Exceptional work! Your vocabulary is expanding fast.",
-            "Spot on accuracy! Keep up the stellar energy.",
-            "Remarkable progress! You're a natural scholar."
+            "You are mastering these radicals with great ease!"
         ];
         
         const stageUpCheers = [
@@ -441,10 +444,12 @@
         const foods = ["🍎", "🍉", "🍇", "🍓", "🍒", "🍑", "🥦", "🥕", "🥑", "🌽", "🍍"];
 
         let score = 0;
-        let currentStageIndex = 0;
+        let currentStageNum = 1;
+        let currentStageRecipes = [];
         let mistakes = 0;
         let wrongRecords = []; 
         let cauldronParts = []; 
+        let isProcessing = false; 
         
         let startTime = Date.now();
         let timerInterval = setInterval(() => {
@@ -455,10 +460,20 @@
         }, 1000);
 
         const partsContainer = document.getElementById('parts-container');
-        function initParts() {
+        
+        function loadStage(stageNum) {
+            currentStageRecipes = stagedRecipes.filter(r => r.stage === stageNum);
             partsContainer.innerHTML = '';
-            let shuffled = rawParts.sort(() => Math.random() - 0.5);
-            shuffled.forEach((char) => {
+            
+            let partsToSpawn = [];
+            currentStageRecipes.forEach(r => {
+                partsToSpawn.push(r.p1);
+                partsToSpawn.push(r.p2);
+            });
+            
+            partsToSpawn.sort(() => Math.random() - 0.5);
+            
+            partsToSpawn.forEach(char => {
                 let div = document.createElement('div');
                 div.className = 'part';
                 div.innerText = char;
@@ -466,8 +481,11 @@
                 partsContainer.appendChild(div);
                 bindDragEvents(div);
             });
+            
+            document.getElementById('stage-indicator').innerText = stages[stageNum - 1].name;
         }
-        initParts();
+
+        loadStage(currentStageNum);
 
         function toggleFullScreen() {
             let elem = document.documentElement;
@@ -497,6 +515,7 @@
         }
 
         function dragStart(e) {
+            if (isProcessing) return; 
             e.preventDefault();
             draggedItem = e.target;
             draggedItem.classList.add('dragging');
@@ -548,7 +567,7 @@
             if (clientX > cauldronRect.left && clientX < cauldronRect.right &&
                 clientY > cauldronRect.top && clientY < cauldronRect.bottom) {
                 
-                if (draggedItem.parentElement !== cauldron) {
+                if (!cauldronParts.includes(draggedItem)) {
                     cauldron.appendChild(draggedItem);
                     cauldronParts.push(draggedItem);
                 }
@@ -557,7 +576,8 @@
                 draggedItem.style.left = (clientX - cauldronRect.left - draggedItem.offsetWidth/2) + 'px';
                 draggedItem.style.top = (clientY - cauldronRect.top - draggedItem.offsetHeight/2) + 'px';
                 
-                if (cauldronParts.length === 2) {
+                if (cauldronParts.length >= 2 && !isProcessing) {
+                    isProcessing = true; 
                     setTimeout(checkRecipe, 150); 
                 }
             } else {
@@ -572,23 +592,33 @@
         }
 
         function resetPart(part) {
-            let children = partsContainer.children;
-            if (children.length > 0) {
-                let randomIndex = Math.floor(Math.random() * children.length);
-                partsContainer.insertBefore(part, children[randomIndex]);
-            } else {
-                partsContainer.appendChild(part);
-            }
-            
+            part.classList.remove('dragging', 'vanish-anim', 'respawn-anim', 'success-anim');
             part.style.position = '';
             part.style.left = '';
             part.style.top = '';
+            part.style.transform = '';
+            part.style.opacity = '';
+            part.style.display = '';
+
+            if (part.parentElement !== partsContainer) {
+                let children = partsContainer.children;
+                if (children.length > 0) {
+                    let randomIndex = Math.floor(Math.random() * children.length);
+                    partsContainer.insertBefore(part, children[randomIndex]);
+                } else {
+                    partsContainer.appendChild(part);
+                }
+            }
+            
             let idx = cauldronParts.indexOf(part);
             if (idx > -1) cauldronParts.splice(idx, 1);
         }
 
         function checkRecipe() {
-            if (cauldronParts.length < 2) return;
+            if (cauldronParts.length < 2) {
+                isProcessing = false;
+                return;
+            }
             let pA = cauldronParts[0];
             let pB = cauldronParts[1];
             
@@ -604,7 +634,7 @@
 
             let matchedRecipe = null;
 
-            for (let r of recipes) {
+            for (let r of currentStageRecipes) {
                 if (!r.completed && ((r.p1 === charA && r.p2 === charB) || (r.p1 === charB && r.p2 === charA))) {
                     let A_is_p1 = (charA === r.p1);
                     let node1_cx = A_is_p1 ? cxA : cxB;
@@ -614,20 +644,17 @@
 
                     let isValid = false;
                     
-                    if (r.p1 === r.p2) {
-                        isValid = true;
-                    } else {
-                        // 🔥 超強磁吸判定：只要大方向對了（左右或上下正確），不用精準對齊也能完美吸附！
-                        if (r.layout === "LR") {
-                            if (Math.abs(node1_cy - node2_cy) < 120) { // 允許合理的上下高度差
-                                if (charA === r.p1 && cxA < cxB) isValid = true;
-                                if (charA === r.p2 && cxB < cxA) isValid = true;
-                            }
-                        } else if (r.layout === "TB") {
-                            if (Math.abs(node1_cx - node2_cx) < 120) { // 允許合理的左右對齊差
-                                if (charA === r.p1 && cyA < cyB) isValid = true;
-                                if (charA === r.p2 && cyB < cyA) isValid = true;
-                            }
+                    if (r.layout === "LR") {
+                        if (Math.abs(node1_cy - node2_cy) < 120) {
+                            if (r.p1 === r.p2) isValid = true;
+                            else if (charA === r.p1 && cxA < cxB) isValid = true;
+                            else if (charA === r.p2 && cxB < cxA) isValid = true;
+                        }
+                    } else if (r.layout === "TB") {
+                        if (Math.abs(node1_cx - node2_cx) < 120) {
+                            if (r.p1 === r.p2) isValid = true;
+                            else if (charA === r.p1 && cyA < cyB) isValid = true;
+                            else if (charA === r.p2 && cyB < cyA) isValid = true;
                         }
                     }
 
@@ -652,43 +679,110 @@
                     pA.style.boxShadow = "none";
                     pA.style.fontSize = "3.5rem";
                     pA.style.cursor = "default";
+                    pA.classList.remove('success-anim'); 
 
-                    let monsterContainer = document.getElementById('monster-container');
-                    let monsterRect = monsterContainer.getBoundingClientRect();
-                    let pARect = pA.getBoundingClientRect();
-                    
-                    let moveX = (monsterRect.left + monsterRect.width/2) - (pARect.left + pARect.width/2);
-                    let moveY = (monsterRect.top + monsterRect.height/2) - (pARect.top + pARect.height/2);
-
-                    pA.style.transition = 'all 0.5s cubic-bezier(0.5, 0, 0.2, 1)';
-                    pA.style.transform = `translate(${moveX}px, ${moveY}px) scale(0.5)`;
-                    pA.style.opacity = '0';
-
-                    setTimeout(() => { monsterContainer.classList.add('is-eating'); }, 300);
-
+                    // 🔥 蔬菜水果在此原地停留 0.5 秒鐘
                     setTimeout(() => {
-                        pA.remove();
-                        pB.remove();
-                        cauldronParts = [];
+                        let monsterContainer = document.getElementById('monster-container');
+                        let monsterRect = monsterContainer.getBoundingClientRect();
+                        let pARect = pA.getBoundingClientRect();
                         
-                        score++;
-                        document.getElementById('score-count').innerText = score;
-                        
-                        monsterContainer.classList.add('eating-anim');
-                        setTimeout(() => {
-                            monsterContainer.classList.remove('eating-anim');
-                            monsterContainer.classList.remove('is-eating'); 
-                        }, 500);
+                        let moveX = (monsterRect.left + monsterRect.width/2) - (pARect.left + pARect.width/2);
+                        let moveY = (monsterRect.top + monsterRect.height/2) - (pARect.top + pARect.height/2);
 
-                        updateProgress();
-                        
-                        if(score === TOTAL_RECIPES) {
-                            clearInterval(timerInterval);
+                        pA.style.transition = 'all 0.5s cubic-bezier(0.5, 0, 0.2, 1)';
+                        pA.style.transform = `translate(${moveX}px, ${moveY}px) scale(0.5)`;
+                        pA.style.opacity = '0';
+
+                        setTimeout(() => { monsterContainer.classList.add('is-eating'); }, 300);
+
+                        setTimeout(() => {
+                            pA.remove();
+                            pB.remove();
+                            cauldronParts = [];
+                            
+                            score++;
+                            document.getElementById('score-count').innerText = score;
+                            
+                            monsterContainer.classList.add('eating-anim');
                             setTimeout(() => {
-                                endGame(true);
-                            }, 3000); 
-                        }
-                    }, 600);
+                                monsterContainer.classList.remove('eating-anim');
+                                monsterContainer.classList.remove('is-eating'); 
+                            }, 500);
+
+                            updateProgress();
+                            
+                            let stageCleared = currentStageRecipes.every(r => r.completed);
+                            
+                            if (stageCleared) {
+                                currentStageNum++;
+                                
+                                if (currentStageNum <= 4) {
+                                    let overlay = document.getElementById('stage-clear-overlay');
+                                    let box = document.getElementById('stage-clear-box');
+                                    
+                                    // 🔥 退回原版 Emoji 設計，確保 100% 顯示
+                                    let icons = ["🌟", "🚀", "✨", "🎉"];
+                                    let titles = [
+                                        "太棒了！<br><span style='font-size: 2.2rem; color: #fff;'>Awesome!</span>", 
+                                        "好厲害！<br><span style='font-size: 2.2rem; color: #fff;'>Amazing!</span>", 
+                                        "超級棒！<br><span style='font-size: 2.2rem; color: #fff;'>Excellent!</span>"
+                                    ];
+                                    
+                                    document.getElementById('stage-clear-icon').innerHTML = icons[currentStageNum-2] || "🌟";
+                                    document.getElementById('stage-clear-title').innerHTML = titles[currentStageNum-2] || "太棒了！<br><span style='font-size: 2.2rem; color: #fff;'>Awesome!</span>";
+                                    document.getElementById('stage-clear-subtitle').innerHTML = "準備進入下一階段...<br><span style='font-size: 1.1rem; color: #cbd5e0;'>Get ready for the next stage...</span>";
+                                    
+                                    overlay.style.display = 'flex';
+                                    setTimeout(() => { box.style.transform = 'scale(1)'; }, 50);
+                                    
+                                    setTimeout(() => {
+                                        box.style.transform = 'scale(0)';
+                                        setTimeout(() => {
+                                            overlay.style.display = 'none';
+                                            
+                                            monsterContainer.className = stages[currentStageNum - 1].class;
+                                            document.getElementById('speech-bubble').innerText = stageUpCheers[currentStageNum - 2];
+                                            loadStage(currentStageNum);
+                                            isProcessing = false; 
+                                        }, 600);
+                                    }, 2500); 
+                                } else {
+                                    let overlay = document.getElementById('stage-clear-overlay');
+                                    let box = document.getElementById('stage-clear-box');
+                                    
+                                    // 最終過關使用火焰 Emoji
+                                    document.getElementById('stage-clear-icon').innerHTML = "🔥";
+                                    document.getElementById('stage-clear-title').innerHTML = "太神了！<br><span style='font-size: 2.2rem; color: #fff;'>Incredible!</span>";
+                                    document.getElementById('stage-clear-subtitle').innerHTML = "終極進化完成...<br><span style='font-size: 1.1rem; color: #cbd5e0;'>Ultimate Evolution Complete...</span>";
+                                    
+                                    overlay.style.display = 'flex';
+                                    setTimeout(() => { box.style.transform = 'scale(1)'; }, 50);
+
+                                    setTimeout(() => {
+                                        box.style.transform = 'scale(0)';
+                                        setTimeout(() => {
+                                            overlay.style.display = 'none';
+                                            
+                                            monsterContainer.className = stages[4].class;
+                                            document.getElementById('speech-bubble').innerText = stageUpCheers[3];
+                                            clearInterval(timerInterval);
+                                            
+                                            // 🔥 最終過關噴火怪獸展示 2 秒鐘後彈出成績單
+                                            setTimeout(() => {
+                                                endGame(true);
+                                            }, 2000); 
+
+                                        }, 600);
+                                    }, 2500); 
+                                }
+                            } else {
+                                document.getElementById('speech-bubble').innerText = standardCheers[Math.floor(Math.random() * standardCheers.length)];
+                                isProcessing = false; 
+                            }
+                        }, 600);
+                    }, 500); // 🍎 停留 0.5 秒
+
                 }, 800);
 
             } else {
@@ -716,9 +810,11 @@
 
                     pA.classList.add('respawn-anim');
                     pB.classList.add('respawn-anim');
+                    
                     setTimeout(() => {
                         pA.classList.remove('respawn-anim');
                         pB.classList.remove('respawn-anim');
+                        isProcessing = false; 
                     }, 400);
 
                 }, 400); 
@@ -729,32 +825,13 @@
             let percent = Math.floor((score / TOTAL_RECIPES) * 100);
             document.getElementById('energy-percent').innerText = percent + "%";
             document.getElementById('energy-bar').style.width = percent + "%";
-
-            let newStageIndex = 0;
-            for (let i = stages.length - 1; i >= 0; i--) {
-                if (score >= stages[i].score) {
-                    newStageIndex = i;
-                    break;
-                }
-            }
-
-            if (newStageIndex > currentStageIndex) {
-                document.getElementById('speech-bubble').innerText = stageUpCheers[newStageIndex - 1];
-                currentStageIndex = newStageIndex;
-                let monsterContainer = document.getElementById('monster-container');
-                monsterContainer.className = stages[currentStageIndex].class;
-            } else if (score < TOTAL_RECIPES) {
-                document.getElementById('speech-bubble').innerText = standardCheers[Math.floor(Math.random() * standardCheers.length)];
-            }
-
-            document.getElementById('stage-indicator').innerText = stages[currentStageIndex].name;
         }
 
         function endGame(isWin) {
             clearInterval(timerInterval); 
             document.getElementById('modal-overlay').style.display = 'flex';
             
-            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-score').innerText = `${score} / ${TOTAL_RECIPES}`;
             document.getElementById('final-time').innerText = document.getElementById('timer').innerText;
 
             if(isWin) {
@@ -784,9 +861,16 @@
             formData.append('mistakes', wrongDetail);
             formData.append('錯題紀錄', wrongDetail);
             
-            let timeString = document.getElementById('timer').innerText;
-            formData.append('timeTaken', timeString); 
-            formData.append('作答時間', timeString); 
+            // 🔥 直接抓取 UI 計時器的文字數字格式 ("00:00")，並包裝成一般文字避免被 Google Sheets 吃掉
+            let timeStringRaw = document.getElementById('final-time').innerText;
+            let finalTimeString = `時長：${timeStringRaw}`;
+
+            formData.append('timeTaken', finalTimeString); 
+            formData.append('作答時間', finalTimeString); 
+            formData.append('花費時間', finalTimeString);
+            formData.append('time', finalTimeString);
+            formData.append('Time', finalTimeString);
+            formData.append('時間', finalTimeString);
             
             formData.append('gameName', 'Monster Evolution Final');
 
